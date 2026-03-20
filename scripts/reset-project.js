@@ -2,7 +2,7 @@
 
 /**
  * This script is used to reset the project to a blank state.
- * It deletes or moves the /app, /components, /hooks, /scripts, and /constants directories to /app-example based on user input and creates a new /app directory with an index.tsx and _layout.tsx file.
+ * It deletes or moves the /app, /components, /hooks, /scripts, and /constants directories to /app-example based on user input and creates a new /app directory plus a basic App.tsx file.
  * You can remove the `reset-project` script from package.json and safely delete this file after running it.
  */
 
@@ -33,10 +33,20 @@ export default function Index() {
 }
 `;
 
-const layoutContent = `import { Stack } from "expo-router";
+const appEntryContent = `import { Text, View } from "react-native";
 
-export default function RootLayout() {
-  return <Stack />;
+export default function App() {
+  return (
+    <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <Text>Edit App.tsx to edit this screen.</Text>
+    </View>
+  );
 }
 `;
 
@@ -80,14 +90,14 @@ const moveDirectories = async (userInput) => {
     await fs.promises.writeFile(indexPath, indexContent);
     console.log("📄 app/index.tsx created.");
 
-    // Create _layout.tsx
-    const layoutPath = path.join(newAppDirPath, "_layout.tsx");
-    await fs.promises.writeFile(layoutPath, layoutContent);
-    console.log("📄 app/_layout.tsx created.");
+    // Create App.tsx
+    const appPath = path.join(root, "App.tsx");
+    await fs.promises.writeFile(appPath, appEntryContent);
+    console.log("📄 App.tsx created.");
 
     console.log("\n✅ Project reset complete. Next steps:");
     console.log(
-      `1. Run \`npx expo start\` to start a development server.\n2. Edit app/index.tsx to edit the main screen.${
+      `1. Run \`npx expo start\` to start a development server.\n2. Edit App.tsx to edit the main screen.${
         userInput === "y"
           ? `\n3. Delete the /${exampleDir} directory when you're done referencing it.`
           : ""
