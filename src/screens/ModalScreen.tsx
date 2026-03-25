@@ -2,9 +2,8 @@ import { useNavigation } from '@react-navigation/native';
 import { type NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { StyleSheet } from 'react-native';
 
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import type { RootStackParamList } from '@/types/navigation';
+import { ThemedText, ThemedView } from '@/src/components/atoms';
+import type { RootStackParamList } from '@/src/types/navigation';
 
 export default function ModalScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();

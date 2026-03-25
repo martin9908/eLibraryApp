@@ -1,15 +1,12 @@
 import { Image } from 'expo-image';
 import { Platform, StyleSheet } from 'react-native';
 
-import { Collapsible } from '@/components/ui/collapsible';
-import { ExternalLink } from '@/components/external-link';
-import ParallaxScrollView from '@/components/parallax-scroll-view';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
-import { IconSymbol } from '@/components/ui/icon-symbol';
 import { Fonts } from '@/constants/theme';
+import { ExternalLink, IconSymbol, ThemedText, ThemedView } from '@/src/components/atoms';
+import ParallaxScrollView from '@/src/components/layouts/ParallaxScrollView';
+import { Collapsible } from '@/src/components/molecules';
 
-export default function TabTwoScreen() {
+export default function ExploreScreen() {
   return (
     <ParallaxScrollView
       headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
@@ -33,13 +30,13 @@ export default function TabTwoScreen() {
       <ThemedText>This app includes example code to help you get started.</ThemedText>
       <Collapsible title="React Navigation setup">
         <ThemedText>
-          This app has two screens:{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> and{' '}
-          <ThemedText type="defaultSemiBold">app/(tabs)/explore.tsx</ThemedText>
+          This app has two tabs in{' '}
+          <ThemedText type="defaultSemiBold">src/screens/HomeScreen.tsx</ThemedText> and{' '}
+          <ThemedText type="defaultSemiBold">src/screens/ExploreScreen.tsx</ThemedText>
         </ThemedText>
         <ThemedText>
-          The navigators are configured in <ThemedText type="defaultSemiBold">App.tsx</ThemedText>{' '}
-          with a root stack and a bottom tab navigator.
+          The navigators are configured in{' '}
+          <ThemedText type="defaultSemiBold">src/navigation/AppNavigator.tsx</ThemedText>.
         </ThemedText>
         <ExternalLink href="https://reactnavigation.org/docs/getting-started">
           <ThemedText type="link">Learn more</ThemedText>
@@ -78,7 +75,7 @@ export default function TabTwoScreen() {
       <Collapsible title="Animations">
         <ThemedText>
           This template includes an example of an animated component. The{' '}
-          <ThemedText type="defaultSemiBold">components/HelloWave.tsx</ThemedText> component uses
+          <ThemedText type="defaultSemiBold">components/hello-wave.tsx</ThemedText> component uses
           the powerful{' '}
           <ThemedText type="defaultSemiBold" style={{ fontFamily: Fonts.mono }}>
             react-native-reanimated
@@ -88,7 +85,8 @@ export default function TabTwoScreen() {
         {Platform.select({
           ios: (
             <ThemedText>
-              The <ThemedText type="defaultSemiBold">components/ParallaxScrollView.tsx</ThemedText>{' '}
+              The{' '}
+              <ThemedText type="defaultSemiBold">components/parallax-scroll-view.tsx</ThemedText>{' '}
               component provides a parallax effect for the header image.
             </ThemedText>
           ),
