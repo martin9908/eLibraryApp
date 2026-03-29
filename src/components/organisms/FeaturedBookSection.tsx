@@ -1,4 +1,4 @@
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, ImageSourcePropType, StyleSheet, View } from 'react-native';
 import { Button, Card, Text, useTheme } from 'react-native-paper';
 
 import { SectionHeader } from '@/src/components/molecules';
@@ -7,8 +7,9 @@ type FeaturedBookSectionProps = {
     title: string;
     author: string;
     description: string;
-    coverSource: number;
+    coverSource: ImageSourcePropType;
     onBorrow: () => void;
+    borrowDisabled?: boolean;
 };
 
 export function FeaturedBookSection({
@@ -17,6 +18,7 @@ export function FeaturedBookSection({
     description,
     coverSource,
     onBorrow,
+    borrowDisabled,
 }: FeaturedBookSectionProps) {
     const theme = useTheme();
 
@@ -36,7 +38,7 @@ export function FeaturedBookSection({
                         <Text variant="bodySmall" style={styles.description}>
                             {description}
                         </Text>
-                        <Button mode="contained" style={styles.borrowButton} onPress={onBorrow}>
+                        <Button mode="contained" style={styles.borrowButton} onPress={onBorrow} disabled={borrowDisabled}>
                             <Text variant="titleMedium" style={styles.borrowButtonLabel}>
                                 Borrow Now
                             </Text>

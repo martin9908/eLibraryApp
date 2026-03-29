@@ -1,35 +1,76 @@
 import { useNavigation } from '@react-navigation/native';
 import { type NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Alert } from 'react-native';
+import { ActivityIndicator } from 'react-native-paper';
 
 import { HomeTemplate } from '@/src/components/templates';
+import { useHomeLibraryData } from '@/src/hooks/useHomeLibraryData';
 import type { RootStackParamList } from '@/src/types/navigation';
 
-const featuredBook = {
-  title: 'The Hobbit',
-  author: 'J.R.R. Tolkien',
-  description: 'An unforgettable journey through Middle-earth filled with adventure.',
-  coverSource: require('../../assets/images/sample_cover.png'),
-};
-
-const continueReading = {
-  title: "Jojo's Bizarre Adventure: Steel Ball Run Vol. 1",
-  progressLabel: 'Page 10 of 20',
-  progress: 0.5,
-  coverSource: require('../../assets/images/sample_cover.png'),
-};
+const CURRENT_USER_ID = 'yBIVzQAZoJZ3Q9jUDcVfWK2rrof2';
 
 export default function HomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { featuredBook, continueReading, loading, error, borrowFeaturedBook } = useHomeLibraryData(CURRENT_USER_ID);
+
+  const featuredCoverSource = featuredBook?.coverImage
+    ? { uri: featuredBook.coverImage }
+    : require('../../assets/images/sample_cover.png');
+
+  const continueReadingCoverSource = continueReading?.coverImage
+    ? { uri: continueReading.coverImage }
+    : require('../../assets/images/SBR_Cover.png');
+
+  const handleBorrowFeaturedBook = async () => {
+    try {
+      await borrowFeaturedBook();
+      Alert.alert('Borrowed', 'You can now open this eBook from Continue Reading.');
+    } catch (borrowError) {
+      const message = borrowError instanceof Error ? borrowError.message : 'Unable to borrow this eBook right now.';
+      Alert.alert('Borrow failed', message);
+    }
+  };
+
+  const handleContinueReading = () => {
+    if (!continueReading) {
+      Alert.alert('No active eBook', 'Borrow an eBook first to continue reading.');
+      return;
+    }
+
+    navigation.navigate('Reader', {
+      bookId: continueReading.bookId,
+      title: continueReading.title,
+    });
+  };
+
+  if (loading) {
+    return <ActivityIndicator style={{ marginTop: 60 }} size="large" />;
+  }
 
   return (
     <HomeTemplate
       userName="Juan Dela Cruz"
-      featuredBook={featuredBook}
-      continueReading={continueReading}
+      featuredBook={{
+        title: featuredBook?.title ?? 'No featured eBook yet',
+        author: featuredBook?.author ?? 'Library',
+        description:
+          featuredBook?.availableCopies && featuredBook.availableCopies > 0
+            ? `${featuredBook.availableCopies} copies available`
+            : 'New eBooks will appear here once added to Firestore.',
+        coverSource: featuredCoverSource,
+      }}
+      continueReading={{
+        title: continueReading?.title ?? 'No active book',
+        progressLabel: continueReading?.progressLabel ?? 'Borrow a book to start reading',
+        progress: continueReading?.progress ?? 0,
+        coverSource: continueReadingCoverSource,
+      }}
       onBrowseEBooks={() => navigation.navigate('Modal')}
       onBrowsePhysicalBooks={() => navigation.navigate('Modal')}
-      onBorrowFeaturedBook={() => navigation.navigate('Modal')}
-      onContinueReading={() => navigation.navigate('Modal')}
+      onBorrowFeaturedBook={handleBorrowFeaturedBook}
+      onContinueReading={handleContinueReading}
+      borrowDisabled={!featuredBook || featuredBook.availableCopies <= 0}
+      errorMessage={error}
     />
   );
 }

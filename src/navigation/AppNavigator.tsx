@@ -13,6 +13,7 @@ import { HapticTab, IconSymbol } from '@/src/components/atoms';
 import ExploreScreen from '@/src/screens/ExploreScreen';
 import HomeScreen from '@/src/screens/HomeScreen';
 import ModalScreen from '@/src/screens/ModalScreen';
+import ReaderScreen from '@/src/screens/ReaderScreen';
 import { getPaperTheme } from '@/src/theme/paperTheme';
 import type { RootStackParamList, RootTabParamList } from '@/src/types/navigation';
 
@@ -60,6 +61,7 @@ export default function AppNavigator() {
         <Stack.Navigator>
           <Stack.Screen name="Tabs" component={TabNavigator} options={{ headerShown: false }} />
           <Stack.Screen name="Modal" component={ModalScreen} options={{ presentation: 'modal', title: 'Modal' }} />
+          <Stack.Screen name="Reader" component={ReaderScreen} options={{ title: 'Reader' }} />
         </Stack.Navigator>
         <StatusBar style="auto" />
       </NavigationContainer>

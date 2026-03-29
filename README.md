@@ -28,6 +28,52 @@ You can start developing by editing files inside the **src** directory.
 - Navigation lives in **src/navigation/AppNavigator.tsx**
 - Screens live in **src/screens**
 
+## Firestore Setup
+
+This app now reads library metadata from Firestore and writes borrow records.
+
+1. Create a local env file from `.env.example`.
+2. Fill in your Firebase web config values:
+
+   ```bash
+   EXPO_PUBLIC_FIREBASE_API_KEY=...
+   EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN=...
+   EXPO_PUBLIC_FIREBASE_PROJECT_ID=...
+   EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET=...
+   EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
+   EXPO_PUBLIC_FIREBASE_APP_ID=...
+   ```
+
+3. Restart Expo after updating env variables.
+
+### Current POC behavior
+
+- Reads featured eBook from the `books` collection.
+- Creates borrow records in `borrowRecords`.
+- Decrements `books.availableCopies` during borrow.
+- Validates active borrow status before opening an external eBook URL.
+
+## Reactotron (Development)
+
+Reactotron is wired in development mode only and auto-initializes from `App.tsx`.
+
+1. Install and open the Reactotron desktop app.
+2. Start your project with `npx expo start`.
+3. Run the app on a simulator/device in the same network.
+4. Confirm your app appears in Reactotron as `eLibraryApp`.
+
+## PDF Reader Integration
+
+The `Reader` screen now uses `react-native-pdf` for in-app rendering after Firestore borrow validation.
+
+- Native (iOS/Android): Uses an embedded PDF viewer.
+- Web: Falls back to opening the PDF URL.
+
+Because `react-native-pdf` is a native module, run this in a development build (not Expo Go):
+
+1. `npx expo prebuild`
+2. `npx expo run:ios` or `npx expo run:android`
+
 ## Learn more
 
 To learn more about developing your project with Expo, look at the following resources:

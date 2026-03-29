@@ -1,4 +1,4 @@
-import { Image, StyleSheet, View } from 'react-native';
+import { Image, ImageSourcePropType, StyleSheet, View } from 'react-native';
 import { Card, ProgressBar, Text, useTheme } from 'react-native-paper';
 
 import { SectionHeader } from '@/src/components/molecules';
@@ -7,7 +7,7 @@ type ContinueReadingSectionProps = {
     title: string;
     progressLabel: string;
     progress: number;
-    coverSource: number;
+    coverSource: ImageSourcePropType;
     onContinue: () => void;
 };
 

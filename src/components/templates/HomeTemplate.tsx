@@ -1,4 +1,5 @@
-import { ScrollView, StyleSheet } from 'react-native';
+import { ImageSourcePropType, ScrollView, StyleSheet } from 'react-native';
+import { Text } from 'react-native-paper';
 
 import {
     ContinueReadingSection,
@@ -13,18 +14,20 @@ type HomeTemplateProps = {
         title: string;
         author: string;
         description: string;
-        coverSource: number;
+        coverSource: ImageSourcePropType;
     };
     continueReading: {
         title: string;
         progressLabel: string;
         progress: number;
-        coverSource: number;
+        coverSource: ImageSourcePropType;
     };
     onBrowseEBooks: () => void;
     onBrowsePhysicalBooks: () => void;
     onBorrowFeaturedBook: () => void;
     onContinueReading: () => void;
+    borrowDisabled?: boolean;
+    errorMessage?: string | null;
 };
 
 export function HomeTemplate({
@@ -35,10 +38,17 @@ export function HomeTemplate({
     onBrowsePhysicalBooks,
     onBorrowFeaturedBook,
     onContinueReading,
+    borrowDisabled,
+    errorMessage,
 }: HomeTemplateProps) {
     return (
         <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
             <HomeHeader userName={userName} />
+            {errorMessage ? (
+                <Text variant="bodyMedium" style={styles.errorText}>
+                    {errorMessage}
+                </Text>
+            ) : null}
             <HomeQuickActions
                 onBrowseEBooks={onBrowseEBooks}
                 onBrowsePhysicalBooks={onBrowsePhysicalBooks}
@@ -49,6 +59,7 @@ export function HomeTemplate({
                 description={featuredBook.description}
                 coverSource={featuredBook.coverSource}
                 onBorrow={onBorrowFeaturedBook}
+                borrowDisabled={borrowDisabled}
             />
             <ContinueReadingSection
                 title={continueReading.title}
@@ -66,5 +77,9 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         paddingVertical: 28,
         marginTop: 32,
+    },
+    errorText: {
+        marginBottom: 12,
+        color: '#B3261E',
     },
 });
