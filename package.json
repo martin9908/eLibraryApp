@@ -2,6 +2,7 @@
   "name": "elibraryapp",
   "main": "expo/AppEntry",
   "version": "1.0.0",
+  "packageManager": "pnpm@11.9.0",
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
