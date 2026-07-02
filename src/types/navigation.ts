@@ -10,6 +10,7 @@ export type RootStackParamList = {
   // ── App ──
   Tabs: undefined;
   Modal: undefined;
+  BookDetail: { bookId: string };
   Reader: {
     bookId: string;
     title: string;
@@ -18,5 +19,5 @@ export type RootStackParamList = {
 
 export type RootTabParamList = {
   Home: undefined;
-  Explore: undefined;
+  Catalog: undefined;
 };

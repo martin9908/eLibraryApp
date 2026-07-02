@@ -1,3 +1,4 @@
+export { BookCard } from './BookCard';
 export { Collapsible } from './Collapsible';
 export { LibraryActionButton } from './LibraryActionButton';
 export { QuickActionCard } from './QuickActionCard';

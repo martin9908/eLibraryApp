@@ -11,7 +11,8 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { HapticTab, IconSymbol } from '@/src/components/atoms';
 import { AuthProvider, useAuth } from '@/src/context/AuthContext';
-import ExploreScreen from '@/src/screens/ExploreScreen';
+import BookDetailScreen from '@/src/screens/BookDetailScreen';
+import CatalogScreen from '@/src/screens/CatalogScreen';
 import HomeScreen from '@/src/screens/HomeScreen';
 import ModalScreen from '@/src/screens/ModalScreen';
 import ReaderScreen from '@/src/screens/ReaderScreen';
@@ -54,11 +55,11 @@ function TabNavigator() {
         }}
       />
       <Tab.Screen
-        name="Explore"
-        component={ExploreScreen}
+        name="Catalog"
+        component={CatalogScreen}
         options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={26} name="paperplane.fill" color={color} />,
+          title: 'Catalog',
+          tabBarIcon: ({ color }) => <IconSymbol size={26} name="books.vertical.fill" color={color} />,
         }}
       />
     </Tab.Navigator>
@@ -96,6 +97,7 @@ function RootNavigator() {
         <>
           <Stack.Screen name="Tabs" component={TabNavigator} options={{ headerShown: false }} />
           <Stack.Screen name="Modal" component={ModalScreen} options={{ presentation: 'modal', title: 'Search' }} />
+          <Stack.Screen name="BookDetail" component={BookDetailScreen} options={{ title: '' }} />
           <Stack.Screen name="Reader" component={ReaderScreen} options={{ title: 'Now Reading' }} />
         </>
       ) : (

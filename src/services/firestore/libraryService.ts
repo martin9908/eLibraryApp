@@ -1,4 +1,5 @@
 import {
+    type QueryConstraint,
     Timestamp,
     addDoc,
     collection,
@@ -7,6 +8,7 @@ import {
     getDocs,
     increment,
     limit,
+    orderBy,
     query,
     runTransaction,
     serverTimestamp,
@@ -149,4 +151,39 @@ export async function canUserAccessBook(userId: string, bookId: string): Promise
         const data = docSnapshot.data() as Partial<BorrowRecord>;
         return data.bookId === bookId && data.returned === false;
     });
+}
+
+export async function getAllBooks(filters: {
+    type?: Book['type'];
+    category?: string;
+} = {}): Promise<Book[]> {
+    const booksRef = collection(db, BOOKS_COLLECTION);
+    const constraints: QueryConstraint[] = [orderBy('title')];
+
+    if (filters.type) {
+        constraints.push(where('type', '==', filters.type));
+    }
+    if (filters.category) {
+        constraints.push(where('category', '==', filters.category));
+    }
+
+    const snapshot = await getDocs(query(booksRef, ...constraints));
+    return snapshot.docs.map((d) => mapBook(d.id, d.data() as Partial<Book>));
+}
+
+export async function getActiveBorrowRecordForBook(
+    userId: string,
+    bookId: string,
+): Promise<BorrowRecord | null> {
+    const recordsRef = collection(db, BORROW_RECORDS_COLLECTION);
+    const q = query(
+        recordsRef,
+        where('userId', '==', userId),
+        where('bookId', '==', bookId),
+        limit(10),
+    );
+    const snapshot = await getDocs(q);
+    const active = snapshot.docs.find((d) => !(d.data() as Partial<BorrowRecord>).returned);
+    if (!active) return null;
+    return mapBorrowRecord(active.id, active.data() as Partial<BorrowRecord>);
 }
