@@ -11,7 +11,9 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { HapticTab, IconSymbol } from '@/src/components/atoms';
 import { AuthProvider, useAuth } from '@/src/context/AuthContext';
+import AccountScreen from '@/src/screens/AccountScreen';
 import BookDetailScreen from '@/src/screens/BookDetailScreen';
+import BorrowHistoryScreen from '@/src/screens/BorrowHistoryScreen';
 import CatalogScreen from '@/src/screens/CatalogScreen';
 import HomeScreen from '@/src/screens/HomeScreen';
 import ModalScreen from '@/src/screens/ModalScreen';
@@ -62,6 +64,14 @@ function TabNavigator() {
           tabBarIcon: ({ color }) => <IconSymbol size={26} name="books.vertical.fill" color={color} />,
         }}
       />
+      <Tab.Screen
+        name="Account"
+        component={AccountScreen}
+        options={{
+          title: 'Account',
+          tabBarIcon: ({ color }) => <IconSymbol size={26} name="person.fill" color={color} />,
+        }}
+      />
     </Tab.Navigator>
   );
 }
@@ -98,6 +108,7 @@ function RootNavigator() {
           <Stack.Screen name="Tabs" component={TabNavigator} options={{ headerShown: false }} />
           <Stack.Screen name="Modal" component={ModalScreen} options={{ presentation: 'modal', title: 'Search' }} />
           <Stack.Screen name="BookDetail" component={BookDetailScreen} options={{ title: '' }} />
+          <Stack.Screen name="BorrowHistory" component={BorrowHistoryScreen} options={{ title: 'Borrow History' }} />
           <Stack.Screen name="Reader" component={ReaderScreen} options={{ title: 'Now Reading' }} />
         </>
       ) : (

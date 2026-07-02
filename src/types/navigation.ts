@@ -11,6 +11,7 @@ export type RootStackParamList = {
   Tabs: undefined;
   Modal: undefined;
   BookDetail: { bookId: string };
+  BorrowHistory: undefined;
   Reader: {
     bookId: string;
     title: string;
@@ -20,4 +21,5 @@ export type RootStackParamList = {
 export type RootTabParamList = {
   Home: undefined;
   Catalog: undefined;
+  Account: undefined;
 };

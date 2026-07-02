@@ -22,5 +22,10 @@ export type BorrowRecord = {
     type: BookType;
     borrowedAt?: Timestamp;
     dueDate?: Timestamp;
+    returnedAt?: Timestamp;
     returned: boolean;
+};
+
+export type BorrowEntry = BorrowRecord & {
+    book: Book | null;
 };

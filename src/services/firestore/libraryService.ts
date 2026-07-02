@@ -4,6 +4,7 @@ import {
     addDoc,
     collection,
     doc,
+    documentId,
     getDoc,
     getDocs,
     increment,
@@ -45,6 +46,7 @@ function mapBorrowRecord(id: string, raw: Partial<BorrowRecord>): BorrowRecord {
         type: raw.type ?? 'ebook',
         borrowedAt: raw.borrowedAt,
         dueDate: raw.dueDate,
+        returnedAt: raw.returnedAt,
         returned: Boolean(raw.returned),
     };
 }
@@ -138,7 +140,7 @@ export async function returnBook(recordId: string, bookId: string): Promise<void
     const recordRef = doc(db, BORROW_RECORDS_COLLECTION, recordId);
     const bookRef = doc(db, BOOKS_COLLECTION, bookId);
 
-    await updateDoc(recordRef, { returned: true });
+    await updateDoc(recordRef, { returned: true, returnedAt: serverTimestamp() });
     await updateDoc(bookRef, { availableCopies: increment(1) });
 }
 
@@ -186,4 +188,35 @@ export async function getActiveBorrowRecordForBook(
     const active = snapshot.docs.find((d) => !(d.data() as Partial<BorrowRecord>).returned);
     if (!active) return null;
     return mapBorrowRecord(active.id, active.data() as Partial<BorrowRecord>);
+}
+
+export async function getAllBorrowRecords(userId: string): Promise<BorrowRecord[]> {
+    const recordsRef = collection(db, BORROW_RECORDS_COLLECTION);
+    const q = query(recordsRef, where('userId', '==', userId));
+    const snapshot = await getDocs(q);
+    const records = snapshot.docs.map((d) =>
+        mapBorrowRecord(d.id, d.data() as Partial<BorrowRecord>),
+    );
+    // Sort newest-first client-side (avoids composite index requirement)
+    return records.sort((a, b) => (b.borrowedAt?.seconds ?? 0) - (a.borrowedAt?.seconds ?? 0));
+}
+
+export async function getBooksByIds(ids: string[]): Promise<Map<string, Book>> {
+    if (ids.length === 0) return new Map();
+    const booksRef = collection(db, BOOKS_COLLECTION);
+    // Firestore 'in' supports max 30 values per query
+    const chunks: string[][] = [];
+    for (let i = 0; i < ids.length; i += 30) {
+        chunks.push(ids.slice(i, i + 30));
+    }
+    const snapshots = await Promise.all(
+        chunks.map((chunk) => getDocs(query(booksRef, where(documentId(), 'in', chunk)))),
+    );
+    const map = new Map<string, Book>();
+    for (const snap of snapshots) {
+        for (const d of snap.docs) {
+            map.set(d.id, mapBook(d.id, d.data() as Partial<Book>));
+        }
+    }
+    return map;
 }
