@@ -1,6 +1,8 @@
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import { type NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Alert } from 'react-native';
+import { setStatusBarStyle } from 'expo-status-bar';
+import { useCallback } from 'react';
+import { Alert, StyleSheet, View } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 
 import { HomeTemplate } from '@/src/components/templates';
@@ -12,6 +14,14 @@ const CURRENT_USER_ID = 'yBIVzQAZoJZ3Q9jUDcVfWK2rrof2';
 export default function HomeScreen() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { featuredBook, continueReading, loading, error, borrowFeaturedBook } = useHomeLibraryData(CURRENT_USER_ID);
+
+  // The Home hero is a dark gradient, so use light status-bar icons while focused.
+  useFocusEffect(
+    useCallback(() => {
+      setStatusBarStyle('light');
+      return () => setStatusBarStyle('auto');
+    }, []),
+  );
 
   const featuredCoverSource = featuredBook?.coverImage
     ? { uri: featuredBook.coverImage }
@@ -44,12 +54,17 @@ export default function HomeScreen() {
   };
 
   if (loading) {
-    return <ActivityIndicator style={{ marginTop: 60 }} size="large" />;
+    return (
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   }
 
   return (
     <HomeTemplate
       userName="Juan Dela Cruz"
+      onSearch={() => navigation.navigate('Modal')}
       featuredBook={{
         title: featuredBook?.title ?? 'No featured eBook yet',
         author: featuredBook?.author ?? 'Library',
@@ -74,3 +89,11 @@ export default function HomeScreen() {
     />
   );
 }
+
+const styles = StyleSheet.create({
+  loadingContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});

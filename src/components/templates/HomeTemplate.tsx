@@ -1,7 +1,9 @@
-import { ImageSourcePropType, ScrollView, StyleSheet } from 'react-native';
-import { Text } from 'react-native-paper';
+import { ImageSourcePropType, ScrollView, StyleSheet, View } from 'react-native';
+import { Text, useTheme } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
+    CategoriesSection,
     ContinueReadingSection,
     FeaturedBookSection,
     HomeHeader,
@@ -26,6 +28,7 @@ type HomeTemplateProps = {
     onBrowsePhysicalBooks: () => void;
     onBorrowFeaturedBook: () => void;
     onContinueReading: () => void;
+    onSearch?: () => void;
     borrowDisabled?: boolean;
     errorMessage?: string | null;
 };
@@ -38,48 +41,58 @@ export function HomeTemplate({
     onBrowsePhysicalBooks,
     onBorrowFeaturedBook,
     onContinueReading,
+    onSearch,
     borrowDisabled,
     errorMessage,
 }: HomeTemplateProps) {
+    const theme = useTheme();
+    const insets = useSafeAreaInsets();
+
     return (
-        <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-            <HomeHeader userName={userName} />
-            {errorMessage ? (
-                <Text variant="bodyMedium" style={styles.errorText}>
-                    {errorMessage}
-                </Text>
-            ) : null}
-            <HomeQuickActions
-                onBrowseEBooks={onBrowseEBooks}
-                onBrowsePhysicalBooks={onBrowsePhysicalBooks}
-            />
-            <FeaturedBookSection
-                title={featuredBook.title}
-                author={featuredBook.author}
-                description={featuredBook.description}
-                coverSource={featuredBook.coverSource}
-                onBorrow={onBorrowFeaturedBook}
-                borrowDisabled={borrowDisabled}
-            />
-            <ContinueReadingSection
-                title={continueReading.title}
-                progressLabel={continueReading.progressLabel}
-                progress={continueReading.progress}
-                coverSource={continueReading.coverSource}
-                onContinue={onContinueReading}
-            />
+        <ScrollView
+            style={{ backgroundColor: theme.colors.background }}
+            contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
+            showsVerticalScrollIndicator={false}>
+            <HomeHeader userName={userName} insetTop={insets.top} onSearchPress={onSearch} />
+
+            <View style={styles.body}>
+                {errorMessage ? (
+                    <Text variant="bodyMedium" style={[styles.errorText, { color: theme.colors.error }]}>
+                        {errorMessage}
+                    </Text>
+                ) : null}
+
+                <HomeQuickActions
+                    onBrowseEBooks={onBrowseEBooks}
+                    onBrowsePhysicalBooks={onBrowsePhysicalBooks}
+                />
+                <CategoriesSection onSelect={onBrowseEBooks} />
+                <FeaturedBookSection
+                    title={featuredBook.title}
+                    author={featuredBook.author}
+                    description={featuredBook.description}
+                    coverSource={featuredBook.coverSource}
+                    onBorrow={onBorrowFeaturedBook}
+                    borrowDisabled={borrowDisabled}
+                />
+                <ContinueReadingSection
+                    title={continueReading.title}
+                    progressLabel={continueReading.progressLabel}
+                    progress={continueReading.progress}
+                    coverSource={continueReading.coverSource}
+                    onContinue={onContinueReading}
+                />
+            </View>
         </ScrollView>
     );
 }
 
 const styles = StyleSheet.create({
-    content: {
-        paddingHorizontal: 16,
-        paddingVertical: 28,
-        marginTop: 32,
+    body: {
+        paddingHorizontal: 20,
+        paddingTop: 24,
     },
     errorText: {
         marginBottom: 12,
-        color: '#B3261E',
     },
 });

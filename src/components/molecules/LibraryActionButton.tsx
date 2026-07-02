@@ -1,15 +1,19 @@
 import { Pressable, StyleSheet } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Icon, Text } from 'react-native-paper';
 
 type LibraryActionButtonProps = {
     label: string;
     backgroundColor: string;
     onPress: () => void;
+    icon?: string;
 };
 
-export function LibraryActionButton({ label, backgroundColor, onPress }: LibraryActionButtonProps) {
+export function LibraryActionButton({ label, backgroundColor, onPress, icon }: LibraryActionButtonProps) {
     return (
-        <Pressable style={[styles.button, { backgroundColor }]} onPress={onPress}>
+        <Pressable
+            style={({ pressed }) => [styles.button, { backgroundColor, opacity: pressed ? 0.85 : 1 }]}
+            onPress={onPress}>
+            {icon ? <Icon source={icon} size={26} color="#FFF" /> : null}
             <Text variant="titleMedium" style={styles.label}>
                 {label}
             </Text>
@@ -26,6 +30,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 16,
         alignItems: 'center',
         justifyContent: 'center',
+        gap: 6,
     },
     label: {
         color: '#FFF',

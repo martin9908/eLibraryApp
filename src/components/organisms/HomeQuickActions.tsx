@@ -1,7 +1,7 @@
 import { StyleSheet, View } from 'react-native';
-import { useTheme } from 'react-native-paper';
 
-import { LibraryActionButton } from '@/src/components/molecules';
+import { QuickActionCard } from '@/src/components/molecules';
+import { useBrandColors } from '@/src/theme/brand';
 
 type HomeQuickActionsProps = {
     onBrowseEBooks: () => void;
@@ -9,18 +9,22 @@ type HomeQuickActionsProps = {
 };
 
 export function HomeQuickActions({ onBrowseEBooks, onBrowsePhysicalBooks }: HomeQuickActionsProps) {
-    const theme = useTheme();
+    const brand = useBrandColors();
 
     return (
         <View style={styles.container}>
-            <LibraryActionButton
-                label="Browse eBooks"
-                backgroundColor={theme.colors.secondary}
+            <QuickActionCard
+                title="eBooks"
+                subtitle="Read instantly"
+                icon="book-open-variant"
+                gradient={brand.accentGradient}
                 onPress={onBrowseEBooks}
             />
-            <LibraryActionButton
-                label="Browse Physical Books"
-                backgroundColor={theme.colors.primary}
+            <QuickActionCard
+                title="Physical Books"
+                subtitle="Reserve & pick up"
+                icon="bookshelf"
+                gradient={brand.accentGradientAlt}
                 onPress={onBrowsePhysicalBooks}
             />
         </View>
@@ -30,13 +34,7 @@ export function HomeQuickActions({ onBrowseEBooks, onBrowsePhysicalBooks }: Home
 const styles = StyleSheet.create({
     container: {
         flexDirection: 'row',
-        gap: 12,
-        marginBottom: 24,
-        backgroundColor: '#FFF',
-        padding: 16,
-        minHeight: 110,
-        alignContent: 'center',
-        justifyContent: 'center',
-        borderRadius: 18,
+        gap: 14,
+        marginBottom: 28,
     },
 });
