@@ -4,6 +4,12 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+approvedBuilds:
+  - '@firebase/util'
+  - protobufjs
+  - sharp
+  - unrs-resolver
+
 importers:
 
   .:
