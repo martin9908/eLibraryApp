@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "NODE_OPTIONS='--localstorage-file=/tmp/nextjs-ls.json' next dev --turbopack",
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit"
