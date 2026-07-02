@@ -9,6 +9,11 @@ import {
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 
 import { auth } from '@/src/lib/firebase';
+import {
+    clearPushToken,
+    registerForPushNotificationsAsync,
+    savePushToken,
+} from '@/src/services/notificationService';
 
 type AuthContextValue = {
     user: User | null;
@@ -34,7 +39,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const signIn = useCallback(async (email: string, password: string) => {
-        await signInWithEmailAndPassword(auth, email, password);
+        const credential = await signInWithEmailAndPassword(auth, email, password);
+        // Register push token in the background — don't block sign-in.
+        registerForPushNotificationsAsync()
+            .then((token) => {
+                if (token) return savePushToken(credential.user.uid, token);
+            })
+            .catch(() => { /* non-fatal */ });
     }, []);
 
     const signUp = useCallback(async (email: string, password: string, displayName: string) => {
@@ -42,11 +53,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await updateProfile(credential.user, { displayName });
         // Refresh the user so displayName is immediately available.
         setUser({ ...credential.user, displayName });
+        // Register push token in the background.
+        registerForPushNotificationsAsync()
+            .then((token) => {
+                if (token) return savePushToken(credential.user.uid, token);
+            })
+            .catch(() => { /* non-fatal */ });
     }, []);
 
     const signOut = useCallback(async () => {
+        // Best-effort: clear the push token before signing out.
+        if (user?.uid) {
+            await clearPushToken(user.uid).catch(() => { /* non-fatal */ });
+        }
         await firebaseSignOut(auth);
-    }, []);
+    }, [user]);
 
     const value = useMemo(
         () => ({ user, initialising, signIn, signUp, signOut }),
