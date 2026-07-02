@@ -6,14 +6,14 @@ import { Alert, StyleSheet, View } from 'react-native';
 import { ActivityIndicator } from 'react-native-paper';
 
 import { HomeTemplate } from '@/src/components/templates';
+import { useAuth } from '@/src/context/AuthContext';
 import { useHomeLibraryData } from '@/src/hooks/useHomeLibraryData';
 import type { RootStackParamList } from '@/src/types/navigation';
 
-const CURRENT_USER_ID = 'yBIVzQAZoJZ3Q9jUDcVfWK2rrof2';
-
 export default function HomeScreen() {
+  const { user } = useAuth();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { featuredBook, continueReading, loading, error, borrowFeaturedBook } = useHomeLibraryData(CURRENT_USER_ID);
+  const { featuredBook, continueReading, loading, error, borrowFeaturedBook } = useHomeLibraryData(user!.uid);
 
   // The Home hero is a dark gradient, so use light status-bar icons while focused.
   useFocusEffect(
@@ -63,7 +63,7 @@ export default function HomeScreen() {
 
   return (
     <HomeTemplate
-      userName="Juan Dela Cruz"
+      userName={user?.displayName ?? 'Patron'}
       onSearch={() => navigation.navigate('Modal')}
       featuredBook={{
         title: featuredBook?.title ?? 'No featured eBook yet',

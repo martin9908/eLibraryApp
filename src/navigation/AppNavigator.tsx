@@ -4,16 +4,19 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { DarkTheme, DefaultTheme, NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet } from 'react-native';
-import { PaperProvider } from 'react-native-paper';
+import { StyleSheet, View } from 'react-native';
+import { ActivityIndicator, PaperProvider } from 'react-native-paper';
 import 'react-native-reanimated';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { HapticTab, IconSymbol } from '@/src/components/atoms';
+import { AuthProvider, useAuth } from '@/src/context/AuthContext';
 import ExploreScreen from '@/src/screens/ExploreScreen';
 import HomeScreen from '@/src/screens/HomeScreen';
 import ModalScreen from '@/src/screens/ModalScreen';
 import ReaderScreen from '@/src/screens/ReaderScreen';
+import LoginScreen from '@/src/screens/auth/LoginScreen';
+import RegisterScreen from '@/src/screens/auth/RegisterScreen';
 import { getPaperTheme } from '@/src/theme/paperTheme';
 import type { RootStackParamList, RootTabParamList } from '@/src/types/navigation';
 
@@ -62,28 +65,63 @@ function TabNavigator() {
   );
 }
 
+/** Shown while Firebase resolves the initial persisted auth state. */
+function SplashScreen() {
+  return (
+    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+      <ActivityIndicator size="large" />
+    </View>
+  );
+}
+
+function RootNavigator() {
+  const { user, initialising } = useAuth();
+  const colorScheme = useColorScheme();
+  const mode = colorScheme === 'dark' ? 'dark' : 'light';
+  const paperTheme = getPaperTheme(mode);
+
+  if (initialising) return <SplashScreen />;
+
+  return (
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: { backgroundColor: paperTheme.colors.primary },
+        headerTintColor: '#FFFFFF',
+        headerTitleStyle: { fontWeight: '800' },
+        headerShadowVisible: false,
+        contentStyle: { backgroundColor: paperTheme.colors.background },
+      }}>
+      {user ? (
+        // ── Authenticated screens ──────────────────────────────────────────
+        <>
+          <Stack.Screen name="Tabs" component={TabNavigator} options={{ headerShown: false }} />
+          <Stack.Screen name="Modal" component={ModalScreen} options={{ presentation: 'modal', title: 'Search' }} />
+          <Stack.Screen name="Reader" component={ReaderScreen} options={{ title: 'Now Reading' }} />
+        </>
+      ) : (
+        // ── Auth screens ───────────────────────────────────────────────────
+        <>
+          <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+          <Stack.Screen name="Register" component={RegisterScreen} options={{ headerShown: false }} />
+        </>
+      )}
+    </Stack.Navigator>
+  );
+}
+
 export default function AppNavigator() {
   const colorScheme = useColorScheme();
   const mode = colorScheme === 'dark' ? 'dark' : 'light';
   const paperTheme = getPaperTheme(mode);
 
   return (
-    <PaperProvider theme={paperTheme}>
-      <NavigationContainer theme={mode === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack.Navigator
-          screenOptions={{
-            headerStyle: { backgroundColor: paperTheme.colors.primary },
-            headerTintColor: '#FFFFFF',
-            headerTitleStyle: { fontWeight: '800' },
-            headerShadowVisible: false,
-            contentStyle: { backgroundColor: paperTheme.colors.background },
-          }}>
-          <Stack.Screen name="Tabs" component={TabNavigator} options={{ headerShown: false }} />
-          <Stack.Screen name="Modal" component={ModalScreen} options={{ presentation: 'modal', title: 'Search' }} />
-          <Stack.Screen name="Reader" component={ReaderScreen} options={{ title: 'Now Reading' }} />
-        </Stack.Navigator>
-        <StatusBar style="auto" />
-      </NavigationContainer>
-    </PaperProvider>
+    <AuthProvider>
+      <PaperProvider theme={paperTheme}>
+        <NavigationContainer theme={mode === 'dark' ? DarkTheme : DefaultTheme}>
+          <RootNavigator />
+          <StatusBar style="auto" />
+        </NavigationContainer>
+      </PaperProvider>
+    </AuthProvider>
   );
 }

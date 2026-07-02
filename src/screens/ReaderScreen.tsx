@@ -5,11 +5,11 @@ import { type ComponentType, useCallback, useEffect, useState } from 'react';
 import { Linking, Platform, Pressable, StyleSheet, View } from 'react-native';
 import { ActivityIndicator, Icon, Surface, Text, useTheme } from 'react-native-paper';
 
+import { useAuth } from '@/src/context/AuthContext';
 import { canUserAccessBook, getBookById } from '@/src/services/firestore/libraryService';
 import { useBrandColors } from '@/src/theme/brand';
 import type { RootStackParamList } from '@/src/types/navigation';
 
-const CURRENT_USER_ID = 'yBIVzQAZoJZ3Q9jUDcVfWK2rrof2';
 const isExpoGo = Constants.appOwnership === 'expo';
 
 type PdfComponentProps = {
@@ -91,6 +91,7 @@ function ReaderStateView({
 
 const ReaderScreen = () => {
     const route = useRoute<ReaderRoute>();
+    const { user } = useAuth();
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [ebookUrl, setEbookUrl] = useState<string | null>(null);
@@ -99,7 +100,7 @@ const ReaderScreen = () => {
         try {
             setLoading(true);
             setErrorMessage(null);
-            const hasAccess = await canUserAccessBook(CURRENT_USER_ID, route.params.bookId);
+            const hasAccess = await canUserAccessBook(user!.uid, route.params.bookId);
 
             if (!hasAccess) {
                 setEbookUrl(null);
@@ -122,7 +123,7 @@ const ReaderScreen = () => {
         } finally {
             setLoading(false);
         }
-    }, [route.params.bookId]);
+    }, [route.params.bookId, user]);
 
     useEffect(() => {
         void loadReaderData();
