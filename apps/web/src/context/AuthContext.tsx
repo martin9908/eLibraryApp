@@ -2,9 +2,9 @@
 
 import {
     createUserWithEmailAndPassword,
+    signOut as firebaseSignOut,
     onAuthStateChanged,
     signInWithEmailAndPassword,
-    signOut as firebaseSignOut,
     updateProfile,
     type User,
 } from 'firebase/auth';

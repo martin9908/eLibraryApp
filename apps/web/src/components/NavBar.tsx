@@ -1,8 +1,8 @@
 'use client';
 
+import { useAuth } from '@/src/context/AuthContext';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { useAuth } from '@/src/context/AuthContext';
 
 export function NavBar() {
     const { user, signOut } = useAuth();
@@ -16,7 +16,10 @@ export function NavBar() {
 
     return (
         <nav className="navbar">
-            <Link href="/" className="navbar-brand">📚 eLibrary</Link>
+            <Link href="/" className="navbar-brand">
+                <span className="brand-mark">📚</span>
+                <span className="brand-text">eLibrary</span>
+            </Link>
             <div className="navbar-links">
                 <Link href="/catalog" className={`nav-link${pathname.startsWith('/catalog') ? ' active' : ''}`}>
                     Catalog
@@ -30,19 +33,19 @@ export function NavBar() {
             <div className="navbar-auth">
                 {user ? (
                     <>
-                        <span style={{ fontSize: '0.85rem', opacity: 0.9 }}>
+                        <span className="navbar-user">
                             {user.displayName ?? user.email}
                         </span>
-                        <button className="btn btn-outline btn-sm" style={{ background: 'transparent', color: '#fff', borderColor: 'rgba(255,255,255,0.6)' }} onClick={handleSignOut}>
+                        <button className="btn btn-outline btn-sm" onClick={handleSignOut}>
                             Sign Out
                         </button>
                     </>
                 ) : (
                     <>
-                        <Link href="/login" className="btn btn-outline btn-sm" style={{ color: '#fff', borderColor: 'rgba(255,255,255,0.6)' }}>
+                        <Link href="/login" className="btn btn-outline btn-sm">
                             Sign In
                         </Link>
-                        <Link href="/register" className="btn btn-white btn-sm">
+                        <Link href="/register" className="btn btn-primary btn-sm">
                             Register
                         </Link>
                     </>

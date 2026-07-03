@@ -44,7 +44,7 @@
         "expo-notifications",
         {
           "icon": "./assets/images/notification-icon.png",
-          "color": "#2196F3",
+          "color": "#0038A8",
           "sounds": [],
           "iosDisplayInForeground": true
         }

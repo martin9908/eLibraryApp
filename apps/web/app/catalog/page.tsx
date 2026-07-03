@@ -1,23 +1,25 @@
 'use client';
 
-import Link from 'next/link';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { BookCard, BookGridSkeleton } from '@/src/components/BookCard';
 import { getAllBooks } from '@/src/services/libraryService';
 import type { Book, BookType } from '@elibrary/types';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 
 type Filter = 'all' | BookType;
 
 const FILTERS: { label: string; value: Filter }[] = [
     { label: 'All', value: 'all' },
-    { label: 'eBooks', value: 'ebook' },
-    { label: 'Physical', value: 'physical' },
+    { label: '📱 eBooks', value: 'ebook' },
+    { label: '📗 Physical', value: 'physical' },
 ];
 
-export default function CatalogPage() {
+function CatalogInner() {
+    const searchParams = useSearchParams();
     const [books, setBooks] = useState<Book[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [search, setSearch] = useState('');
+    const [search, setSearch] = useState(searchParams.get('q') ?? '');
     const [filter, setFilter] = useState<Filter>('all');
 
     const fetchBooks = useCallback(async (type: Filter) => {
@@ -51,34 +53,52 @@ export default function CatalogPage() {
     return (
         <>
             <div className="page-header">
-                <h1 className="page-title">Catalog</h1>
-                <p className="page-subtitle">Browse and borrow from our collection.</p>
+                <h1 className="page-title">Browse the Collection</h1>
+                <p className="page-subtitle">Discover, borrow, and read from thousands of titles.</p>
             </div>
 
-            <input
-                className="search-bar"
-                placeholder="Search titles, authors, categories…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-            />
-
-            <div className="filters-row">
-                {FILTERS.map((f) => (
-                    <button
-                        key={f.value}
-                        className={`filter-chip${filter === f.value ? ' active' : ''}`}
-                        onClick={() => setFilter(f.value)}>
-                        {f.label}
-                    </button>
-                ))}
+            <div className="catalog-toolbar">
+                <div className="search-bar-wrap">
+                    <svg className="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round">
+                        <circle cx="11" cy="11" r="7" />
+                        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                    <input
+                        className="search-bar"
+                        placeholder="Search titles, authors, categories…"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                    />
+                </div>
+                <div className="filters-row">
+                    {FILTERS.map((f) => (
+                        <button
+                            key={f.value}
+                            className={`filter-chip${filter === f.value ? ' active' : ''}`}
+                            onClick={() => setFilter(f.value)}>
+                            {f.label}
+                        </button>
+                    ))}
+                </div>
             </div>
+
+            {!loading && !error && (
+                <p className="result-count">
+                    {filtered.length} {filtered.length === 1 ? 'title' : 'titles'}
+                    {search.trim() ? ` matching “${search.trim()}”` : ''}
+                </p>
+            )}
 
             {loading ? (
-                <div className="loading-container"><div className="spinner" /></div>
+                <BookGridSkeleton count={10} />
             ) : error ? (
-                <div className="alert alert-error">{error}</div>
+                <div className="alert alert-error">⚠️ {error}</div>
             ) : filtered.length === 0 ? (
-                <div className="empty-state">No books found.</div>
+                <div className="empty-state">
+                    <span className="empty-emoji">🔍</span>
+                    <div className="empty-title">No titles found</div>
+                    <p>Try a different search term or filter.</p>
+                </div>
             ) : (
                 <div className="book-grid">
                     {filtered.map((book) => (
@@ -90,31 +110,10 @@ export default function CatalogPage() {
     );
 }
 
-function BookCard({ book }: { book: Book }) {
-    const initials = book.title.slice(0, 2).toUpperCase();
+export default function CatalogPage() {
     return (
-        <Link href={`/catalog/${book.id}`} className="book-card card">
-            <div className="book-cover">
-                {book.coverImage ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={book.coverImage} alt={book.title} />
-                ) : (
-                    <span>{initials}</span>
-                )}
-            </div>
-            <div className="book-info">
-                <div className="book-title">{book.title}</div>
-                <div className="book-author">{book.author}</div>
-                <div style={{ display: 'flex', gap: 6, alignItems: 'center', marginTop: 6 }}>
-                    <span className={`badge badge-${book.type}`}>
-                        {book.type === 'ebook' ? 'eBook' : 'Physical'}
-                    </span>
-                    <span
-                        style={{ fontSize: '0.78rem', color: book.availableCopies > 0 ? '#2e7d32' : '#c62828' }}>
-                        {book.availableCopies > 0 ? `${book.availableCopies} avail.` : 'Unavailable'}
-                    </span>
-                </div>
-            </div>
-        </Link>
+        <Suspense fallback={<BookGridSkeleton count={10} />}>
+            <CatalogInner />
+        </Suspense>
     );
 }

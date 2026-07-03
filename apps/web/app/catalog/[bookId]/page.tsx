@@ -1,7 +1,5 @@
 'use client';
 
-import { useParams, useRouter } from 'next/navigation';
-import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/src/context/AuthContext';
 import {
     borrowBook,
@@ -10,6 +8,16 @@ import {
     returnBook,
 } from '@/src/services/libraryService';
 import type { Book, BorrowRecord } from '@elibrary/types';
+import dynamic from 'next/dynamic';
+import Link from 'next/link';
+import { useParams, useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
+
+// pdf.js touches the DOM/Worker — load the reader client-side only.
+const PdfReader = dynamic(
+    () => import('@/src/components/PdfReader').then((m) => m.PdfReader),
+    { ssr: false },
+);
 
 export default function BookDetailPage() {
     const params = useParams();
@@ -22,6 +30,7 @@ export default function BookDetailPage() {
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [readerOpen, setReaderOpen] = useState(false);
 
     const load = useCallback(async () => {
         setLoading(true);
@@ -68,7 +77,15 @@ export default function BookDetailPage() {
     };
 
     if (loading) return <div className="loading-container"><div className="spinner" /></div>;
-    if (!book) return <div className="empty-state">Book not found.</div>;
+    if (!book) {
+        return (
+            <div className="empty-state">
+                <span className="empty-emoji">📕</span>
+                <div className="empty-title">Book not found</div>
+                <p>This title may have been removed. <Link href="/catalog" style={{ color: 'var(--indigo-600)', fontWeight: 700 }}>Back to catalog</Link></p>
+            </div>
+        );
+    }
 
     const isBorrowed = record !== null;
     const canBorrow = !isBorrowed && book.availableCopies > 0;
@@ -76,6 +93,8 @@ export default function BookDetailPage() {
 
     return (
         <>
+            <Link href="/catalog" className="back-link">← Back to catalog</Link>
+
             <div className="detail-layout">
                 {/* Cover */}
                 <div className="detail-cover">
@@ -90,44 +109,45 @@ export default function BookDetailPage() {
                 {/* Info */}
                 <div className="detail-info">
                     <h1 className="detail-title">{book.title}</h1>
-                    <p className="detail-author">{book.author}</p>
+                    <p className="detail-author">by {book.author}</p>
 
                     <div className="detail-meta">
                         <span className={`badge badge-${book.type}`}>
-                            {book.type === 'ebook' ? 'eBook' : 'Physical'}
+                            {book.type === 'ebook' ? '📱 eBook' : '📗 Physical'}
                         </span>
-                        <span className="badge" style={{ background: '#f5f5f5', color: '#555' }}>
-                            {book.category}
-                        </span>
+                        <span className="badge badge-neutral">{book.category}</span>
                     </div>
 
-                    <div className="detail-availability">
-                        Copies available:{' '}
-                        <span className={book.availableCopies > 0 ? 'availability-ok' : 'availability-none'}>
-                            {book.availableCopies} / {book.totalCopies}
+                    <div className="availability-panel">
+                        <span className={`availability-figure ${book.availableCopies > 0 ? 'ok' : 'none'}`}>
+                            {book.availableCopies}
                         </span>
+                        <div>
+                            <div style={{ fontWeight: 700, fontSize: '0.9rem' }}>
+                                {book.availableCopies > 0 ? 'Available now' : 'Currently unavailable'}
+                            </div>
+                            <div className="availability-label">
+                                {book.availableCopies} of {book.totalCopies} copies
+                            </div>
+                        </div>
                     </div>
 
                     {isBorrowed && (
-                        <p style={{ marginTop: 8, fontSize: '0.88rem', color: '#1565c0', fontWeight: 600 }}>
-                            ✓ You currently have this book borrowed
+                        <div className="borrowed-note">
+                            ✓ You have this book
                             {record?.dueDate
                                 ? ` · Due ${new Date(record.dueDate.seconds * 1000).toLocaleDateString()}`
                                 : ''}
-                        </p>
+                        </div>
                     )}
 
-                    {error && <div className="alert alert-error" style={{ marginTop: 12 }}>{error}</div>}
+                    {error && <div className="alert alert-error" style={{ marginTop: 14 }}>⚠️ {error}</div>}
 
                     <div className="detail-actions">
                         {isBorrowed && book.type === 'ebook' && book.ebookUrl && (
-                            <a
-                                href={book.ebookUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="btn btn-secondary">
+                            <button className="btn btn-secondary" onClick={() => setReaderOpen(true)}>
                                 📖 Read Online
-                            </a>
+                            </button>
                         )}
                         {isBorrowed && (
                             <button
@@ -142,7 +162,7 @@ export default function BookDetailPage() {
                                 className="btn btn-primary"
                                 onClick={handleBorrow}
                                 disabled={actionLoading}>
-                                {actionLoading ? 'Borrowing…' : 'Borrow'}
+                                {actionLoading ? 'Borrowing…' : user ? 'Borrow this book' : 'Sign in to borrow'}
                             </button>
                         )}
                         {!isBorrowed && book.availableCopies === 0 && (
@@ -151,13 +171,17 @@ export default function BookDetailPage() {
                             </button>
                         )}
                         {!user && canBorrow && (
-                            <p style={{ fontSize: '0.82rem', color: '#666', alignSelf: 'center' }}>
-                                <a href="/login" style={{ color: '#2196F3' }}>Sign in</a> to borrow this book.
-                            </p>
+                            <span className="detail-hint">
+                                <Link href="/login">Sign in</Link> to borrow this title.
+                            </span>
                         )}
                     </div>
                 </div>
             </div>
+
+            {readerOpen && book.ebookUrl && (
+                <PdfReader url={book.ebookUrl} title={book.title} onClose={() => setReaderOpen(false)} />
+            )}
         </>
     );
 }

@@ -1,33 +1,16 @@
 import { useRoute } from '@react-navigation/native';
-import Constants from 'expo-constants';
 import { LinearGradient } from 'expo-linear-gradient';
-import { type ComponentType, useCallback, useEffect, useState } from 'react';
-import { Linking, Platform, Pressable, StyleSheet, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Linking, Pressable, StyleSheet, View } from 'react-native';
 import { ActivityIndicator, Icon, Surface, Text, useTheme } from 'react-native-paper';
+import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 
 import { useAuth } from '@/src/context/AuthContext';
+import { resolveEbookSource } from '@/src/lib/ebookSource';
 import { canUserAccessBook, getBookById } from '@/src/services/firestore/libraryService';
+import { buildPdfViewerHtml, originOf } from '@/src/screens/reader/pdfViewerHtml';
 import { useBrandColors } from '@/src/theme/brand';
 import type { RootStackParamList } from '@/src/types/navigation';
-
-const isExpoGo = Constants.appOwnership === 'expo';
-
-type PdfComponentProps = {
-    source: { uri: string; cache: boolean };
-    style: object;
-    trustAllCerts: boolean;
-    onError: (error: Error) => void;
-};
-
-let NativePdf: ComponentType<PdfComponentProps> | null = null;
-
-if (!isExpoGo && Platform.OS !== 'web') {
-    try {
-        NativePdf = require('react-native-pdf').default as ComponentType<PdfComponentProps>;
-    } catch {
-        NativePdf = null;
-    }
-}
 
 type ReaderRoute = {
     key: string;
@@ -91,15 +74,20 @@ function ReaderStateView({
 
 const ReaderScreen = () => {
     const route = useRoute<ReaderRoute>();
+    const theme = useTheme();
     const { user } = useAuth();
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [ebookUrl, setEbookUrl] = useState<string | null>(null);
+    const [rendering, setRendering] = useState(true);
+    const [renderError, setRenderError] = useState<string | null>(null);
 
     const loadReaderData = useCallback(async () => {
         try {
             setLoading(true);
             setErrorMessage(null);
+            setRenderError(null);
+            setRendering(true);
             const hasAccess = await canUserAccessBook(user!.uid, route.params.bookId);
 
             if (!hasAccess) {
@@ -129,6 +117,25 @@ const ReaderScreen = () => {
         void loadReaderData();
     }, [loadReaderData]);
 
+    const source = useMemo(() => (ebookUrl ? resolveEbookSource(ebookUrl) : null), [ebookUrl]);
+    const html = useMemo(
+        () => (source?.kind === 'pdf' ? buildPdfViewerHtml(source.url) : ''),
+        [source],
+    );
+
+    const onMessage = useCallback((event: WebViewMessageEvent) => {
+        try {
+            const data = JSON.parse(event.nativeEvent.data) as { type: string; message?: string };
+            if (data.type === 'loaded') setRendering(false);
+            else if (data.type === 'error') {
+                setRendering(false);
+                setRenderError(data.message ?? 'This eBook could not be displayed.');
+            }
+        } catch {
+            // ignore malformed messages
+        }
+    }, []);
+
     if (loading) {
         return (
             <View style={styles.stateContainer}>
@@ -154,14 +161,14 @@ const ReaderScreen = () => {
         );
     }
 
-    if (Platform.OS === 'web' || isExpoGo || !NativePdf) {
+    if (renderError) {
         return (
             <ReaderStateView
-                icon="book-open-page-variant"
-                iconTone="brand"
+                icon="file-alert-outline"
+                iconTone="error"
                 title={route.params.title}
-                message="In-app PDF rendering requires a native development build. In Expo Go and on web, open the PDF in your browser."
-                actionLabel="Open PDF"
+                message={renderError}
+                actionLabel="Open in Browser"
                 actionIcon="open-in-new"
                 onAction={() => void Linking.openURL(ebookUrl)}
             />
@@ -170,14 +177,37 @@ const ReaderScreen = () => {
 
     return (
         <View style={styles.pdfContainer}>
-            <NativePdf
-                source={{ uri: ebookUrl, cache: true }}
+            <WebView
+                originWhitelist={['*']}
+                source={
+                    source?.kind === 'drive'
+                        ? { uri: source.embedUrl }
+                        : { html, baseUrl: originOf(ebookUrl) }
+                }
                 style={styles.pdf}
-                trustAllCerts={false}
-                onError={(error) => {
-                    setErrorMessage(error.message);
+                javaScriptEnabled
+                domStorageEnabled
+                startInLoadingState={false}
+                allowFileAccess
+                onMessage={onMessage}
+                onLoadEnd={() => {
+                    // Drive's embedded viewer can't postMessage back; clear the
+                    // overlay once its page finishes loading.
+                    if (source?.kind === 'drive') setRendering(false);
+                }}
+                onError={() => {
+                    setRendering(false);
+                    setRenderError('The reader failed to load. Check your connection and try again.');
                 }}
             />
+            {rendering && (
+                <View style={[styles.overlay, { backgroundColor: theme.colors.background }]}>
+                    <ActivityIndicator size="large" />
+                    <Text variant="bodyMedium" style={styles.stateText}>
+                        Preparing pages…
+                    </Text>
+                </View>
+            )}
         </View>
     );
 };
@@ -232,12 +262,19 @@ const styles = StyleSheet.create({
     },
     pdfContainer: {
         flex: 1,
-        backgroundColor: '#FFF',
+        backgroundColor: '#0C1B3A',
     },
     pdf: {
         flex: 1,
         width: '100%',
         height: '100%',
+        backgroundColor: '#0C1B3A',
+    },
+    overlay: {
+        ...StyleSheet.absoluteFillObject,
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 12,
     },
     stateContainer: {
         flex: 1,

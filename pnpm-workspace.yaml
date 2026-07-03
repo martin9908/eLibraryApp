@@ -4,6 +4,8 @@ packages:
   - 'functions'
 allowBuilds:
   '@firebase/util': true
+  # pdfjs-dist's optional native canvas — never built; aliased to a stub for the browser.
+  canvas: false
   protobufjs: true
   sharp: true
   unrs-resolver: true

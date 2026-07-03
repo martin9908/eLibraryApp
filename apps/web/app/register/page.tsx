@@ -1,9 +1,9 @@
 'use client';
 
+import { useAuth } from '@/src/context/AuthContext';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { useAuth } from '@/src/context/AuthContext';
 
 export default function RegisterPage() {
     const { signUp } = useAuth();
@@ -44,10 +44,11 @@ export default function RegisterPage() {
     return (
         <div className="auth-container">
             <div className="card auth-card">
-                <h1 className="auth-title">Create Account</h1>
-                <p className="auth-subtitle">Join the eLibrary community.</p>
+                <span className="auth-badge">📚 eLibrary</span>
+                <h1 className="auth-title">Create your account</h1>
+                <p className="auth-subtitle">Join for free and start borrowing today.</p>
 
-                {error && <div className="alert alert-error">{error}</div>}
+                {error && <div className="alert alert-error">⚠️ {error}</div>}
 
                 <form onSubmit={handleSubmit}>
                     <div className="form-group">
@@ -98,15 +99,15 @@ export default function RegisterPage() {
                             autoComplete="new-password"
                         />
                     </div>
-                    <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={loading}>
+                    <button type="submit" className="btn btn-primary btn-block" disabled={loading}>
                         {loading ? 'Creating account…' : 'Create Account'}
                     </button>
                 </form>
 
                 <hr className="divider" />
-                <p style={{ textAlign: 'center', fontSize: '0.88rem', color: '#555' }}>
+                <p className="auth-footer">
                     Already have an account?{' '}
-                    <Link href="/login" style={{ color: '#2196F3', fontWeight: 600 }}>Sign In</Link>
+                    <Link href="/login">Sign in</Link>
                 </p>
             </div>
         </div>

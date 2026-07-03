@@ -1,3 +1,5 @@
+import { mobileAccents, mobileGradients } from '@elibrary/theme';
+
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 type Gradient = readonly [string, string, ...string[]];
@@ -30,36 +32,39 @@ export type BrandColors = {
     categoryPalette: readonly string[];
 };
 
+// Colors come from the shared @elibrary/theme package (single source of truth,
+// kept in sync with the web app). The white-on-gradient overlays below are
+// mobile-only presentation details, so they stay local.
 const LIGHT: BrandColors = {
-    heroGradient: ['#0B3FA8', '#1668E3', '#33A9FF'],
+    heroGradient: mobileGradients.light.hero,
     heroText: '#FFFFFF',
     heroSubtext: 'rgba(255, 255, 255, 0.85)',
     heroField: 'rgba(255, 255, 255, 0.20)',
     heroFieldText: 'rgba(255, 255, 255, 0.92)',
     heroDecor: 'rgba(255, 255, 255, 0.10)',
-    ctaGradient: ['#1668E3', '#33A9FF'],
-    accentGradient: ['#1E88E5', '#42A5F5'],
-    accentGradientAlt: ['#00A98F', '#2ED3B7'],
-    ratingStar: '#FFB300',
-    shadow: '#0D2B57',
-    glow: 'rgba(37, 99, 235, 0.35)',
-    categoryPalette: ['#1E88E5', '#00A98F', '#8E44E8', '#E8632C', '#D81B60', '#0EA5A0', '#3F51B5'],
+    ctaGradient: mobileGradients.light.cta,
+    accentGradient: mobileGradients.light.accent,
+    accentGradientAlt: mobileGradients.light.accentAlt,
+    ratingStar: mobileAccents.light.ratingStar,
+    shadow: mobileAccents.light.shadow,
+    glow: mobileAccents.light.glow,
+    categoryPalette: mobileAccents.light.categoryPalette,
 };
 
 const DARK: BrandColors = {
-    heroGradient: ['#071B3A', '#0E3B7A', '#1E6FD0'],
+    heroGradient: mobileGradients.dark.hero,
     heroText: '#FFFFFF',
     heroSubtext: 'rgba(255, 255, 255, 0.80)',
     heroField: 'rgba(255, 255, 255, 0.14)',
     heroFieldText: 'rgba(255, 255, 255, 0.90)',
     heroDecor: 'rgba(255, 255, 255, 0.07)',
-    ctaGradient: ['#1E6FD0', '#3AA0FF'],
-    accentGradient: ['#1E88E5', '#4FB0FF'],
-    accentGradientAlt: ['#0E8C77', '#2ED3B7'],
-    ratingStar: '#FFC94D',
-    shadow: '#000000',
-    glow: 'rgba(59, 130, 246, 0.28)',
-    categoryPalette: ['#5AB0FF', '#3FD9C0', '#B48CFF', '#FF9A6B', '#FF7BAE', '#57D7D2', '#8A97FF'],
+    ctaGradient: mobileGradients.dark.cta,
+    accentGradient: mobileGradients.dark.accent,
+    accentGradientAlt: mobileGradients.dark.accentAlt,
+    ratingStar: mobileAccents.dark.ratingStar,
+    shadow: mobileAccents.dark.shadow,
+    glow: mobileAccents.dark.glow,
+    categoryPalette: mobileAccents.dark.categoryPalette,
 };
 
 export function getBrandColors(mode: 'light' | 'dark'): BrandColors {
