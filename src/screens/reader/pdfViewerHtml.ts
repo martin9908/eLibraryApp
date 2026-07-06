@@ -51,9 +51,10 @@ export function buildPdfViewerHtml(url: string): string {
 
       pdfjsLib.getDocument({ url: ${safeUrl} }).promise.then(function (pdf) {
         status.style.display = 'none';
-        post({ type: 'loaded', pages: pdf.numPages });
+        var total = pdf.numPages;
+        post({ type: 'loaded', pages: total });
         var chain = Promise.resolve();
-        for (var n = 1; n <= pdf.numPages; n++) {
+        for (var n = 1; n <= total; n++) {
           (function (pageNum) {
             chain = chain.then(function () {
               return pdf.getPage(pageNum).then(function (page) {
@@ -62,12 +63,38 @@ export function buildPdfViewerHtml(url: string): string {
                 var ctx = canvas.getContext('2d');
                 canvas.width = viewport.width;
                 canvas.height = viewport.height;
+                canvas.dataset.page = String(pageNum);
                 pages.appendChild(canvas);
                 return page.render({ canvasContext: ctx, viewport: viewport }).promise;
               });
             });
           })(n);
         }
+        // Track reading position: report the top-most visible page as the user
+        // scrolls (throttled) so Continue Reading reflects real progress.
+        var lastReported = 0;
+        var ticking = false;
+        function currentPage() {
+          var canvases = pages.querySelectorAll('canvas');
+          for (var i = 0; i < canvases.length; i++) {
+            var r = canvases[i].getBoundingClientRect();
+            if (r.bottom > window.innerHeight * 0.35) {
+              return parseInt(canvases[i].dataset.page || '1', 10);
+            }
+          }
+          return canvases.length ? total : 1;
+        }
+        function reportProgress() {
+          ticking = false;
+          var p = currentPage();
+          if (p !== lastReported) {
+            lastReported = p;
+            post({ type: 'progress', page: p, pages: total });
+          }
+        }
+        window.addEventListener('scroll', function () {
+          if (!ticking) { ticking = true; setTimeout(reportProgress, 400); }
+        }, { passive: true });
         return chain;
       }).catch(function (err) {
         status.style.display = 'block';

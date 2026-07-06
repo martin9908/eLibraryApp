@@ -1,8 +1,8 @@
-import { collection, doc, getDocs, limit, query, setDoc, updateDoc, where } from 'firebase/firestore';
+import { collection, doc, getDocs, limit, orderBy, query, setDoc, updateDoc, where } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 
 import { db, functions } from '@/src/lib/firebase';
-import type { AccountStatus, Book, Role } from '@elibrary/types';
+import type { AccountStatus, AuditEntry, Book, Role } from '@elibrary/types';
 
 // ── Callables (privileged; Admin SDK enforces authz server-side) ──────────────
 
@@ -81,4 +81,12 @@ export async function updateBook(id: string, changes: Partial<BookInput>): Promi
 export async function listBooksByLibrary(libraryId: string, max = 100): Promise<Book[]> {
     const snap = await getDocs(query(collection(db, 'books'), where('libraryId', '==', libraryId), limit(max)));
     return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<Book, 'id'>) }));
+}
+
+// ── Admin: audit log ──────────────────────────────────────────────────────────
+
+/** Recent audit entries, newest first (admin-only per rules). */
+export async function listAuditLog(max = 100): Promise<AuditEntry[]> {
+    const snap = await getDocs(query(collection(db, 'auditLog'), orderBy('createdAt', 'desc'), limit(max)));
+    return snap.docs.map((d) => ({ id: d.id, ...(d.data() as Omit<AuditEntry, 'id'>) }));
 }

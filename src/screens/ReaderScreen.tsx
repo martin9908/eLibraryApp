@@ -8,6 +8,7 @@ import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 import { useAuth } from '@/src/context/AuthContext';
 import { resolveEbookSource } from '@/src/lib/ebookSource';
 import { canUserAccessBook, getBookById } from '@/src/services/firestore/libraryService';
+import { saveReadingProgress } from '@/src/services/firestore/readingProgressService';
 import { buildPdfViewerHtml, originOf } from '@/src/screens/reader/pdfViewerHtml';
 import { useBrandColors } from '@/src/theme/brand';
 import type { RootStackParamList } from '@/src/types/navigation';
@@ -125,16 +126,21 @@ const ReaderScreen = () => {
 
     const onMessage = useCallback((event: WebViewMessageEvent) => {
         try {
-            const data = JSON.parse(event.nativeEvent.data) as { type: string; message?: string };
+            const data = JSON.parse(event.nativeEvent.data) as {
+                type: string; message?: string; page?: number; pages?: number;
+            };
             if (data.type === 'loaded') setRendering(false);
             else if (data.type === 'error') {
                 setRendering(false);
                 setRenderError(data.message ?? 'This eBook could not be displayed.');
+            } else if (data.type === 'progress' && user && data.page && data.pages) {
+                // Persist reading position (owner-only) so Continue Reading is real.
+                void saveReadingProgress(user.uid, route.params.bookId, data.page, data.pages);
             }
         } catch {
             // ignore malformed messages
         }
-    }, []);
+    }, [user, route.params.bookId]);
 
     if (loading) {
         return (
