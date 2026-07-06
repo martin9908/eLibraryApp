@@ -23,6 +23,19 @@ export async function deleteBook(bookId: string): Promise<void> {
     await httpsCallable(functions, 'deleteBook')({ bookId });
 }
 
+/** Suspend/reactivate an account; librarian limited to patrons in scope (US2). */
+export async function setAccountStatus(targetUid: string, status: AccountStatus): Promise<void> {
+    await httpsCallable(functions, 'setAccountStatus')({ targetUid, status });
+}
+
+/** Update a patron's profile (never role); scoped for librarians (US2). */
+export async function updatePatron(
+    targetUid: string,
+    changes: { homeLibraryId?: string; memberType?: string },
+): Promise<void> {
+    await httpsCallable(functions, 'updatePatron')({ targetUid, changes });
+}
+
 // ── Admin: user directory (for the Librarians management screen) ──────────────
 
 export type ManagedUser = {
@@ -35,21 +48,32 @@ export type ManagedUser = {
     assignedRegion?: string;
 };
 
+/** List patrons, optionally restricted to a home library (librarian scope). */
+export async function listPatrons(homeLibraryId?: string, max = 100): Promise<ManagedUser[]> {
+    const ref = collection(db, 'users');
+    const q = homeLibraryId
+        ? query(ref, where('role', '==', 'patron'), where('homeLibraryId', '==', homeLibraryId), limit(max))
+        : query(ref, where('role', '==', 'patron'), limit(max));
+    const snap = await getDocs(q);
+    return snap.docs.map((d) => mapManagedUser(d.id, d.data()));
+}
+
+function mapManagedUser(uid: string, data: Record<string, unknown>): ManagedUser {
+    return {
+        uid,
+        role: (data.role as Role) ?? 'patron',
+        status: (data.status as AccountStatus) ?? 'active',
+        memberType: data.memberType as string | undefined,
+        homeLibraryId: data.homeLibraryId as string | undefined,
+        assignedLibraryIds: (data.assignedLibraryIds as string[] | undefined) ?? undefined,
+        assignedRegion: data.assignedRegion as string | undefined,
+    };
+}
+
 /** List users (admin/librarian read per rules). Capped for the management list. */
 export async function listUsers(max = 100): Promise<ManagedUser[]> {
     const snap = await getDocs(query(collection(db, 'users'), limit(max)));
-    return snap.docs.map((d) => {
-        const data = d.data();
-        return {
-            uid: d.id,
-            role: (data.role as Role) ?? 'patron',
-            status: (data.status as AccountStatus) ?? 'active',
-            memberType: data.memberType as string | undefined,
-            homeLibraryId: data.homeLibraryId as string | undefined,
-            assignedLibraryIds: (data.assignedLibraryIds as string[] | undefined) ?? undefined,
-            assignedRegion: data.assignedRegion as string | undefined,
-        };
-    });
+    return snap.docs.map((d) => mapManagedUser(d.id, d.data()));
 }
 
 // ── Inventory writes (direct Firestore; rules enforce role + library scope) ───

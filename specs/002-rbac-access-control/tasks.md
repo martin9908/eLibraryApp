@@ -85,11 +85,11 @@ live in `functions/src/rbac/`; enforcement in `firestore.rules`; shared types in
 
 **Independent Test**: Librarian for Library A manages Library A inventory/patrons; is denied for Library B; cannot change any role or manage a librarian/admin; retains patron features.
 
-- [ ] T021 [P] [US2] `functions/src/rbac/setAccountStatus.ts` — suspend/reactivate; librarian limited to **patrons within scope**, admin any (except last admin); clears role claim on suspend; audits (FR-006/009/014, contracts/cloud-functions.md); export from `index.ts`.
-- [ ] T022 [P] [US2] `functions/src/rbac/updatePatron.ts` — scoped patron-profile updates (never `role`); librarian-in-scope or admin only; audits when non-owner (FR-006/009); export from `index.ts`.
+- [X] T021 [P] [US2] `functions/src/rbac/setAccountStatus.ts` — suspend/reactivate; librarian limited to **patrons within scope**, admin any (except last admin); clears role claim on suspend; audits (FR-006/009/014, contracts/cloud-functions.md); export from `index.ts`.
+- [X] T022 [P] [US2] `functions/src/rbac/updatePatron.ts` — scoped patron-profile updates (never `role`); librarian-in-scope or admin only; audits when non-owner (FR-006/009); export from `index.ts`.
 - [X] T023 [P] [US2] `functions/src/rbac/deleteBook.ts` — scoped delete with the **active-loans invariant** (refuse/require resolution); audits (FR-015); export from `index.ts`.
 - [X] T024 [US2] Web inventory management: `apps/web/app/manage/inventory/page.tsx` (+ needed components) — create/edit inventory via rules-guarded Firestore writes, delete via `deleteBook`; scoped to the librarian's libraries (FR-009).
-- [ ] T025 [US2] Web patron management: `apps/web/app/manage/patrons/page.tsx` — list/view/suspend/edit patrons within scope via `setAccountStatus`/`updatePatron` (FR-009).
+- [X] T025 [US2] Web patron management: `apps/web/app/manage/patrons/page.tsx` — list/view/suspend/edit patrons within scope via `setAccountStatus`/`updatePatron` (FR-009).
 - [ ] T026 [P] [US2] Mobile management screens under `src/screens/manage/` (inventory + patrons), scoped, mirroring the web surfaces (FR-016).
 - [ ] T027 [US2] Rules-emulator tests: librarian **can** write `books` where `libraryId` in scope; **denied** out-of-scope books and out-of-scope patrons; **denied** any `role` change and any librarian/admin management (FR-006/009, SC-003).
 - [ ] T028 [US2] Validate US2 in `quickstart.md` scenarios 6–10; run typecheck + lint.
@@ -107,8 +107,8 @@ live in `functions/src/rbac/`; enforcement in `firestore.rules`; shared types in
 - [X] T029 [P] [US3] `functions/src/rbac/assignRole.ts` — admin-only assign/revoke `patron|librarian|admin` + librarian scope; sets claim + mirror; **refuses to demote/remove the last active admin**; audits (`role.assign`/`role.revoke`) (FR-005/010/012, SC-004/006); export from `index.ts`.
 - [X] T030 [US3] Web librarian management: `apps/web/app/manage/librarians/page.tsx` — admin assigns/revokes roles and library/region scope via `assignRole`; triggers target `refreshClaims()` guidance (FR-005/010).
 - [ ] T031 [P] [US3] Mobile admin management screen under `src/screens/manage/` for role/scope assignment (mirrors web).
-- [ ] T032 [P] [US3] Audit-log view: `apps/web/app/manage/audit/page.tsx` (admin) reading `auditLog` (FR-013, SC-007); optional scoped view for librarians.
-- [ ] T033 [US3] Admin scope-bypass: ensure inventory/patron management UIs allow nationwide action for admins (reuse US2 surfaces with admin capability) (FR-010).
+- [X] T032 [P] [US3] Audit-log view: `apps/web/app/manage/audit/page.tsx` (admin) reading `auditLog` (FR-013, SC-007); optional scoped view for librarians.
+- [X] T033 [US3] Admin scope-bypass: ensure inventory/patron management UIs allow nationwide action for admins (reuse US2 surfaces with admin capability) (FR-010).
 - [ ] T034 [US3] Rules/functions-emulator tests: admin bypasses scope; `assignRole` last-admin protection holds; audit entries written for role changes; suspended admin cannot act (FR-010/012/013, SC-004/006/007).
 - [ ] T035 [US3] Validate US3 in `quickstart.md` scenarios 11–14; run typecheck + lint.
 

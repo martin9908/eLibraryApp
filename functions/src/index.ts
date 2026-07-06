@@ -9,8 +9,10 @@ const db = getFirestore();
 // Default new users to Patron (FR-002). Privileged, Admin-SDK-only mutations —
 // the client can never change a role (enforced by security rules).
 export { onUserCreate } from './rbac/onUserCreate';
-export { assignRole } from './rbac/assignRole';   // admin: assign/revoke role + scope (US3)
-export { deleteBook } from './rbac/deleteBook';    // librarian/admin: scoped delete w/ active-loan guard (US2)
+export { assignRole } from './rbac/assignRole';         // admin: assign/revoke role + scope (US3)
+export { deleteBook } from './rbac/deleteBook';          // librarian/admin: scoped delete w/ active-loan guard (US2)
+export { setAccountStatus } from './rbac/setAccountStatus'; // suspend/reactivate; scoped for librarians (US2)
+export { updatePatron } from './rbac/updatePatron';      // scoped patron-profile edits (US2)
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers

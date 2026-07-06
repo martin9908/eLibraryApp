@@ -31,7 +31,7 @@ function ManageHomeInner() {
 
     const areas: { key: string; title: string; desc: string; href?: string; show: boolean }[] = [
         { key: 'inventory', title: '📚 Inventory', desc: 'Add, edit, and remove titles and copies for your library.', href: '/manage/inventory', show: true },
-        { key: 'patrons', title: '👥 Patrons', desc: 'View, assist, and manage patron accounts (coming soon).', show: true },
+        { key: 'patrons', title: '👥 Patrons', desc: 'View, suspend/reactivate, and edit patron accounts.', href: '/manage/patrons', show: true },
         { key: 'librarians', title: '🛡️ Librarians', desc: 'Assign roles and library/region scope.', href: '/manage/librarians', show: canManageLibrarians(role) },
         { key: 'audit', title: '🧾 Audit Log', desc: 'Review privileged actions (role changes, deletions).', href: '/manage/audit', show: canManageLibrarians(role) },
     ];
