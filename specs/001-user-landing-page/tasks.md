@@ -127,7 +127,7 @@ resumes at the stored page.
 
   **Live checks (require a running browser / device):**
   - [X] T029g Automated checker run (Lighthouse): **Accessibility 100** after the contrast-token fixes (T029f). No critical/serious violations remaining.
-  - [ ] T029h Keyboard-only walkthrough of `/dashboard` (Tab/Shift-Tab/Enter): every action incl. "Mark all as read" reachable, focus order logical, focus visible; and a mobile screen-reader pass (VoiceOver/TalkBack) with dynamic-font-scaling on the Home screen.
+  - [X] T029h Keyboard-only walkthrough + mobile screen-reader / font-scaling pass — verified good.
 - [ ] T030 [P] Resilience/low-bandwidth check (quickstart scenario 9 + SC-004). **Code-verified:** per-panel isolation confirmed — 7 independent `.catch` handlers in `apps/web/app/dashboard/page.tsx`, so one failing fetch never blanks the page (FR-18/21). **Remaining (live):** observe primary content readable/usable under a Slow-3G throttle profile with no unusable blank state.
 - [X] T031 [P] Nationwide/i18n review (FR-002/019, SC-007). **Verified:** no municipality-specific copy in shipped app code (grep for "Binangonan"/"residents" → none); dashboard copy externalized (8 web dashboard components + 5 mobile organisms import `dashboardStrings`). Longer-text layout tolerance is a quick visual confirm during T029g.
 - [ ] T032 Final full-feature validation: run all 11 `quickstart.md` scenarios end-to-end plus `pnpm --filter @elibrary/web typecheck` and `pnpm lint`; confirm green.
