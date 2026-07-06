@@ -8,10 +8,10 @@ export function SiteFooter() {
                 <div>
                     <div className="footer-brand">
                         <span className="brand-mark">📚</span>
-                        eLibrary
+                        Aklatan+
                     </div>
                     <p className="footer-note">
-                        © {year} eLibrary · A digital collection for every reader.
+                        © {year} Aklatan+ · A digital collection for every reader.
                     </p>
                 </div>
                 <div className="footer-links">

@@ -29,3 +29,71 @@ export type BorrowRecord = {
 export type BorrowEntry = BorrowRecord & {
     book: Book | null;
 };
+
+/** Member type shown on the dashboard greeting. */
+export type MemberType = 'Student' | 'Teacher' | 'Parent' | 'Community';
+
+/** Dashboard-relevant fields of the users/{uid} profile document. */
+export type UserProfile = {
+    homeLibraryId?: string;
+    memberType?: MemberType;
+};
+
+/** Weekly service hours for a library branch. */
+export type LibraryHours = {
+    /** 24h "HH:mm" opening time. */
+    open: string;
+    /** 24h "HH:mm" closing time. */
+    close: string;
+    /** Human-readable served days, e.g. "Mon–Sun". */
+    days: string;
+};
+
+/** A participating local library (branch) in the nationwide service. */
+export type Library = {
+    id: string;
+    name: string;
+    region: string;
+    hours?: LibraryHours;
+    contact?: string;
+};
+
+export type NotificationCategory =
+    | 'availability'
+    | 'dueReminder'
+    | 'returnConfirm'
+    | 'general';
+
+/** An in-app account event shown in the member's notifications feed. */
+export type AppNotification = {
+    id: string;
+    userId: string;
+    category: NotificationCategory;
+    title: string;
+    body?: string;
+    read: boolean;
+    createdAt?: Timestamp;
+};
+
+/** A member's resume point within a title they have started reading. */
+export type ReadingProgress = {
+    id: string;
+    userId: string;
+    bookId: string;
+    currentPage: number;
+    totalPages: number;
+    updatedAt?: Timestamp;
+};
+
+/** A Continue Reading row: progress joined with its (possibly missing) book. */
+export type ReadingProgressEntry = {
+    progress: ReadingProgress;
+    book: Book | null;
+};
+
+/** A Due Soon row: an active borrow joined with derived urgency metadata. */
+export type DueSoonEntry = BorrowEntry & {
+    urgency: 'overdue' | 'dueSoon';
+    label: string;
+    daysLeft: number;
+};

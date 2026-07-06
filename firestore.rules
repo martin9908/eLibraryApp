@@ -1,0 +1,59 @@
+rules_version = '2';
+
+// eLibrary+ Firestore security rules.
+//
+// Reader privacy is non-negotiable (Constitution Principle IV / spec FR-020):
+// personal collections are readable/writable only by their owner. The public
+// catalog stays readable; library branch info is readable to signed-in members.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // Public catalog — anyone may read; writes are administrative (out of band).
+    match /books/{bookId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Member profile — owner only. Holds homeLibraryId, memberType, push token.
+    match /users/{uid} {
+      allow read, write: if isOwner(uid);
+    }
+
+    // Borrow records — owner only. Prevents exposing another member's loans.
+    match /borrowRecords/{id} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+    }
+
+    // In-app notifications feed — owner only. Client updates are limited to the
+    // `read` flag (mark-read); no cross-user or arbitrary-field writes.
+    match /notifications/{id} {
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update: if isSignedIn()
+        && resource.data.userId == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      allow create, delete: if false; // generated server-side (Cloud Functions)
+    }
+
+    // Reading progress — owner only.
+    match /readingProgress/{id} {
+      allow read, write: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+    }
+
+    // Library branches — non-personal; readable to signed-in members.
+    match /libraries/{id} {
+      allow read: if isSignedIn();
+      allow write: if false; // managed administratively
+    }
+  }
+}

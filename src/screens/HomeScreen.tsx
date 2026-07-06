@@ -13,7 +13,23 @@ import type { RootStackParamList } from '@/src/types/navigation';
 export default function HomeScreen() {
   const { user } = useAuth();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { featuredBook, continueReading, loading, error, borrowFeaturedBook } = useHomeLibraryData(user!.uid);
+  const {
+    featuredBook,
+    continueReading,
+    loading,
+    error,
+    borrowFeaturedBook,
+    memberType,
+    homeLibrary,
+    homeLibraryLoading,
+    dueSoon,
+    dueSoonLoading,
+    notifications,
+    notificationsLoading,
+    unreadCount,
+    markOneRead,
+    markAllRead,
+  } = useHomeLibraryData(user!.uid);
 
   // The Home hero is a dark gradient, so use light status-bar icons while focused.
   useFocusEffect(
@@ -64,7 +80,9 @@ export default function HomeScreen() {
   return (
     <HomeTemplate
       userName={user?.displayName ?? 'Patron'}
+      memberType={memberType}
       onSearch={() => navigation.navigate('Modal')}
+      onNotificationsPress={() => navigation.navigate('Modal')}
       featuredBook={{
         title: featuredBook?.title ?? 'No featured eBook yet',
         author: featuredBook?.author ?? 'Library',
@@ -86,6 +104,20 @@ export default function HomeScreen() {
       onContinueReading={handleContinueReading}
       borrowDisabled={!featuredBook || featuredBook.availableCopies <= 0}
       errorMessage={error}
+      // Dashboard panels
+      unreadCount={unreadCount}
+      notifications={notifications}
+      notificationsLoading={notificationsLoading}
+      onMarkAllRead={markAllRead}
+      onMarkOneRead={markOneRead}
+      dueSoon={dueSoon}
+      dueSoonLoading={dueSoonLoading}
+      onDueSoonSelect={(bookId) => navigation.navigate('BookDetail', { bookId })}
+      onViewAllDueSoon={() => navigation.navigate('BorrowHistory')}
+      homeLibrary={homeLibrary}
+      homeLibraryLoading={homeLibraryLoading}
+      onChooseLibrary={() => navigation.navigate('Modal')}
+      onQuickLink={() => navigation.navigate('Modal')}
     />
   );
 }

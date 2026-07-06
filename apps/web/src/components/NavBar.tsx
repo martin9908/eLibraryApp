@@ -16,11 +16,16 @@ export function NavBar() {
 
     return (
         <nav className="navbar">
-            <Link href="/" className="navbar-brand">
+            <Link href={user ? '/dashboard' : '/'} className="navbar-brand">
                 <span className="brand-mark">📚</span>
-                <span className="brand-text">eLibrary</span>
+                <span className="brand-text">Aklatan+</span>
             </Link>
             <div className="navbar-links">
+                {user && (
+                    <Link href="/dashboard" className={`nav-link${pathname === '/dashboard' ? ' active' : ''}`}>
+                        Dashboard
+                    </Link>
+                )}
                 <Link href="/catalog" className={`nav-link${pathname.startsWith('/catalog') ? ' active' : ''}`}>
                     Catalog
                 </Link>

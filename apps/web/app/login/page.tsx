@@ -35,7 +35,7 @@ export default function LoginPage() {
         setLoading(true);
         try {
             await signIn(email, password);
-            router.push('/');
+            router.push('/dashboard');
         } catch (err) {
             const code = (err as { code?: string }).code ?? '';
             setError(friendlyError(code));
@@ -47,7 +47,7 @@ export default function LoginPage() {
     return (
         <div className="auth-container">
             <div className="card auth-card">
-                <span className="auth-badge">📚 eLibrary</span>
+                <span className="auth-badge">📚 Aklatan+</span>
                 <h1 className="auth-title">Welcome back</h1>
                 <p className="auth-subtitle">Sign in to borrow books and pick up your reading.</p>
 

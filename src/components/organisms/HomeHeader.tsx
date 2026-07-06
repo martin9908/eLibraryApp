@@ -3,11 +3,15 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Avatar, Icon, Text } from 'react-native-paper';
 
 import { useBrandColors } from '@/src/theme/brand';
+import type { MemberType } from '@/src/types/library';
 
 type HomeHeaderProps = {
     userName: string;
+    memberType?: MemberType;
+    unreadCount?: number;
     insetTop: number;
     onSearchPress?: () => void;
+    onNotificationsPress?: () => void;
 };
 
 function greetingForNow(): { text: string; emoji: string } {
@@ -26,7 +30,14 @@ function initialsFor(name: string): string {
         .join('');
 }
 
-export function HomeHeader({ userName, insetTop, onSearchPress }: HomeHeaderProps) {
+export function HomeHeader({
+    userName,
+    memberType,
+    unreadCount = 0,
+    insetTop,
+    onSearchPress,
+    onNotificationsPress,
+}: HomeHeaderProps) {
     const brand = useBrandColors();
     const greeting = greetingForNow();
 
@@ -45,7 +56,7 @@ export function HomeHeader({ userName, insetTop, onSearchPress }: HomeHeaderProp
                     <View style={[styles.eyebrowPill, { backgroundColor: brand.heroField }]}>
                         <Icon source="book-open-page-variant" size={13} color={brand.heroText} />
                         <Text variant="labelSmall" style={[styles.eyebrow, { color: brand.heroText }]}>
-                            NATIONAL LIBRARY
+                            {memberType ? `NATIONAL LIBRARY · ${memberType.toUpperCase()}` : 'NATIONAL LIBRARY'}
                         </Text>
                     </View>
                     <Text variant="bodyLarge" style={{ color: brand.heroSubtext }}>
@@ -58,12 +69,23 @@ export function HomeHeader({ userName, insetTop, onSearchPress }: HomeHeaderProp
 
                 <View style={styles.actionsCol}>
                     <Pressable
+                        onPress={onNotificationsPress}
+                        accessibilityRole="button"
+                        accessibilityLabel={
+                            unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'
+                        }
                         style={({ pressed }) => [
                             styles.bell,
                             { backgroundColor: brand.heroField, opacity: pressed ? 0.75 : 1 },
                         ]}>
                         <Icon source="bell-outline" size={20} color={brand.heroText} />
-                        <View style={styles.bellDot} />
+                        {unreadCount > 0 ? (
+                            <View style={styles.bellBadge}>
+                                <Text style={styles.bellBadgeText}>
+                                    {unreadCount > 9 ? '9+' : unreadCount}
+                                </Text>
+                            </View>
+                        ) : null}
                     </Pressable>
                     <Avatar.Text
                         size={48}
@@ -153,14 +175,23 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    bellDot: {
+    bellBadge: {
         position: 'absolute',
-        top: 10,
-        right: 11,
-        width: 8,
-        height: 8,
-        borderRadius: 4,
+        top: 4,
+        right: 4,
+        minWidth: 16,
+        height: 16,
+        paddingHorizontal: 3,
+        borderRadius: 8,
         backgroundColor: '#FF5252',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    bellBadgeText: {
+        color: '#FFFFFF',
+        fontSize: 10,
+        fontWeight: '800',
+        lineHeight: 14,
     },
     avatarLabel: {
         fontWeight: '700',

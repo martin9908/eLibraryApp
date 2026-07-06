@@ -18,7 +18,7 @@ import {
 } from 'firebase/firestore';
 
 import { db } from '@/src/lib/firebase';
-import type { Book, BorrowRecord } from '@/src/types/library';
+import type { Book, BorrowRecord, DueSoonEntry } from '@/src/types/library';
 
 const BOOKS_COLLECTION = 'books';
 const BORROW_RECORDS_COLLECTION = 'borrowRecords';
@@ -199,6 +199,61 @@ export async function getAllBorrowRecords(userId: string): Promise<BorrowRecord[
     );
     // Sort newest-first client-side (avoids composite index requirement)
     return records.sort((a, b) => (b.borrowedAt?.seconds ?? 0) - (a.borrowedAt?.seconds ?? 0));
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/**
+ * Featured eBooks for the dashboard discovery row. Prefers titles flagged
+ * `featured: true`; falls back to any eBooks so the row is never empty during
+ * rollout. Never throws on empty — returns [].
+ */
+export async function getFeaturedBooks(max = 4): Promise<Book[]> {
+    const booksRef = collection(db, BOOKS_COLLECTION);
+    try {
+        const snapshot = await getDocs(
+            query(booksRef, where('type', '==', 'ebook'), where('featured', '==', true), limit(max)),
+        );
+        if (!snapshot.empty) {
+            return snapshot.docs.map((d) => mapBook(d.id, d.data() as Partial<Book>));
+        }
+    } catch {
+        // Missing composite index or no matches — fall through to the fallback.
+    }
+    const fallback = await getDocs(query(booksRef, where('type', '==', 'ebook'), limit(max)));
+    return fallback.docs.map((d) => mapBook(d.id, d.data() as Partial<Book>));
+}
+
+function dueSoonLabel(daysLeft: number): { urgency: 'overdue' | 'dueSoon'; label: string } {
+    if (daysLeft < 0) return { urgency: 'overdue', label: 'Overdue' };
+    if (daysLeft === 0) return { urgency: 'dueSoon', label: 'Due today' };
+    if (daysLeft === 1) return { urgency: 'dueSoon', label: 'Due tomorrow' };
+    return { urgency: 'dueSoon', label: `${daysLeft} days left` };
+}
+
+/**
+ * Active (returned === false) borrow records classified for the Due Soon panel:
+ * overdue (dueDate < now) or due-soon (within `windowDays`). Sorted most urgent
+ * first. Scoped to the passed userId — never returns another member's records.
+ */
+export async function getDueSoon(userId: string, windowDays = 3): Promise<DueSoonEntry[]> {
+    const records = (await getAllBorrowRecords(userId)).filter((r) => !r.returned && r.dueDate);
+    if (records.length === 0) return [];
+
+    const bookMap = await getBooksByIds(Array.from(new Set(records.map((r) => r.bookId))));
+    const now = Date.now();
+
+    const entries: DueSoonEntry[] = [];
+    for (const r of records) {
+        const dueMs = (r.dueDate?.seconds ?? 0) * 1000;
+        const daysLeft = Math.ceil((dueMs - now) / DAY_MS);
+        const overdue = dueMs < now;
+        if (!overdue && daysLeft > windowDays) continue;
+        const { urgency, label } = dueSoonLabel(daysLeft);
+        entries.push({ ...r, book: bookMap.get(r.bookId) ?? null, urgency, label, daysLeft });
+    }
+
+    return entries.sort((a, b) => a.daysLeft - b.daysLeft);
 }
 
 export async function getBooksByIds(ids: string[]): Promise<Map<string, Book>> {

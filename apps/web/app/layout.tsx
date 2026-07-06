@@ -1,8 +1,8 @@
 import { buildThemeCss } from '@elibrary/theme';
 import type { Metadata } from 'next';
 import { Inter, Plus_Jakarta_Sans } from 'next/font/google';
-import { Providers } from './providers';
 import './globals.css';
+import { Providers } from './providers';
 
 const inter = Inter({
     subsets: ['latin'],
@@ -18,7 +18,7 @@ const jakarta = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-    title: 'eLibrary — Read anything, anywhere',
+    title: 'Aklatan+ — Read anything, anywhere',
     description: 'Browse the collection, borrow books, and read eBooks instantly. Your library, online.',
 };
 

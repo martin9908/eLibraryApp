@@ -28,7 +28,7 @@ export default function AppNavigator() {
       <SafeAreaView style={styles.safeArea}>
         <View style={styles.container}>
           <Appbar.Header mode="center-aligned">
-            <Appbar.Content title="eLibrary" />
+            <Appbar.Content title="Aklatan+" />
           </Appbar.Header>
 
           <View style={styles.content}>

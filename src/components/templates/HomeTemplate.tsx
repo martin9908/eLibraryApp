@@ -5,13 +5,19 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
     CategoriesSection,
     ContinueReadingSection,
+    DueSoonSection,
     FeaturedBookSection,
     HomeHeader,
     HomeQuickActions,
+    LibraryHoursSection,
+    NotificationsSection,
+    QuickLinksSection,
 } from '@/src/components/organisms';
+import type { AppNotification, DueSoonEntry, Library, MemberType } from '@/src/types/library';
 
 type HomeTemplateProps = {
     userName: string;
+    memberType: MemberType;
     featuredBook: {
         title: string;
         author: string;
@@ -29,12 +35,28 @@ type HomeTemplateProps = {
     onBorrowFeaturedBook: () => void;
     onContinueReading: () => void;
     onSearch?: () => void;
+    onNotificationsPress?: () => void;
     borrowDisabled?: boolean;
     errorMessage?: string | null;
+    // Dashboard panels
+    unreadCount: number;
+    notifications: AppNotification[];
+    notificationsLoading: boolean;
+    onMarkAllRead: () => void;
+    onMarkOneRead: (id: string) => void;
+    dueSoon: DueSoonEntry[];
+    dueSoonLoading: boolean;
+    onDueSoonSelect?: (bookId: string, title: string) => void;
+    onViewAllDueSoon?: () => void;
+    homeLibrary: Library | null;
+    homeLibraryLoading: boolean;
+    onChooseLibrary?: () => void;
+    onQuickLink?: (key: string) => void;
 };
 
 export function HomeTemplate({
     userName,
+    memberType,
     featuredBook,
     continueReading,
     onBrowseEBooks,
@@ -42,8 +64,22 @@ export function HomeTemplate({
     onBorrowFeaturedBook,
     onContinueReading,
     onSearch,
+    onNotificationsPress,
     borrowDisabled,
     errorMessage,
+    unreadCount,
+    notifications,
+    notificationsLoading,
+    onMarkAllRead,
+    onMarkOneRead,
+    dueSoon,
+    dueSoonLoading,
+    onDueSoonSelect,
+    onViewAllDueSoon,
+    homeLibrary,
+    homeLibraryLoading,
+    onChooseLibrary,
+    onQuickLink,
 }: HomeTemplateProps) {
     const theme = useTheme();
     const insets = useSafeAreaInsets();
@@ -53,7 +89,14 @@ export function HomeTemplate({
             style={{ backgroundColor: theme.colors.background }}
             contentContainerStyle={{ paddingBottom: insets.bottom + 32 }}
             showsVerticalScrollIndicator={false}>
-            <HomeHeader userName={userName} insetTop={insets.top} onSearchPress={onSearch} />
+            <HomeHeader
+                userName={userName}
+                memberType={memberType}
+                unreadCount={unreadCount}
+                insetTop={insets.top}
+                onSearchPress={onSearch}
+                onNotificationsPress={onNotificationsPress}
+            />
 
             <View style={styles.body}>
                 {errorMessage ? (
@@ -66,7 +109,6 @@ export function HomeTemplate({
                     onBrowseEBooks={onBrowseEBooks}
                     onBrowsePhysicalBooks={onBrowsePhysicalBooks}
                 />
-                <CategoriesSection onSelect={onBrowseEBooks} />
                 <FeaturedBookSection
                     title={featuredBook.title}
                     author={featuredBook.author}
@@ -82,6 +124,26 @@ export function HomeTemplate({
                     coverSource={continueReading.coverSource}
                     onContinue={onContinueReading}
                 />
+                <DueSoonSection
+                    items={dueSoon}
+                    loading={dueSoonLoading}
+                    onViewAll={onViewAllDueSoon}
+                    onSelect={onDueSoonSelect}
+                />
+                <NotificationsSection
+                    items={notifications}
+                    unread={unreadCount}
+                    loading={notificationsLoading}
+                    onMarkAll={onMarkAllRead}
+                    onMarkOne={onMarkOneRead}
+                />
+                <LibraryHoursSection
+                    library={homeLibrary}
+                    loading={homeLibraryLoading}
+                    onChooseLibrary={onChooseLibrary}
+                />
+                <CategoriesSection onSelect={onBrowseEBooks} />
+                <QuickLinksSection onSelect={onQuickLink} />
             </View>
         </ScrollView>
     );

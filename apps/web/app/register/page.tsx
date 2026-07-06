@@ -26,7 +26,7 @@ export default function RegisterPage() {
         setLoading(true);
         try {
             await signUp(email, password, displayName);
-            router.push('/');
+            router.push('/dashboard');
         } catch (err) {
             const code = (err as { code?: string }).code ?? '';
             if (code === 'auth/email-already-in-use') {
@@ -44,7 +44,7 @@ export default function RegisterPage() {
     return (
         <div className="auth-container">
             <div className="card auth-card">
-                <span className="auth-badge">📚 eLibrary</span>
+                <span className="auth-badge">📚 Aklatan+</span>
                 <h1 className="auth-title">Create your account</h1>
                 <p className="auth-subtitle">Join for free and start borrowing today.</p>
 
