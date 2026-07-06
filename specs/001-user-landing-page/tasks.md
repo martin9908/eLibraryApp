@@ -33,7 +33,7 @@ pattern.
 ## Phase 1: Setup
 
 - [X] T001 Verify workspace builds cleanly before changes: run `pnpm install` then `pnpm --filter @elibrary/web typecheck` and `pnpm lint` from repo root; record baseline. (Baseline: web typecheck clean; root `eslint .` has pre-existing monorepo-wide noise incl. `@/`-alias `import/no-unresolved` and missing Next plugin rules — not introduced by this feature.)
-- [ ] T002 [P] Seed Firestore per `specs/001-user-landing-page/quickstart.md` "Prerequisites" (books with `featured`/zero-availability, ≥1 `libraries` doc, a test user with `homeLibraryId`+`memberType`, borrowRecords due-soon+overdue, ≥1 unread notification, ≥1 readingProgress) for local validation. **[Requires live Firebase — run before manual validation.]**
+- [X] T002 [P] Seed Firestore per `specs/001-user-landing-page/quickstart.md` "Prerequisites" — done via `functions/scripts/seed-dashboard.js` (libraries, featured/zero-copy books, member profile, due-soon+overdue loans, unread notification, readingProgress, second-user isolation data).
 
 ---
 
@@ -66,7 +66,7 @@ municipality-specific branding.
 - [X] T011 [P] [US1] Build `apps/web/src/components/dashboard/LibraryHours.tsx` — shows home-library name + open/closed (via `isOpenNow`) + hours; when `library` is null render a "choose your home library" prompt (FR-003, FR-016, edge case); own loading/empty state.
 - [X] T012 [P] [US1] Build `apps/web/src/components/dashboard/QuickLinks.tsx` — reserve / library rules / user guide / contact support links (FR-007).
 - [X] T013 [US1] Wire US1 panels into `apps/web/app/dashboard/page.tsx`: fetch `getHomeLibrary(user.uid)` in an isolated (per-panel) effect, render WelcomeBanner, BrowseActions, LibraryHours, QuickLinks; ensure a failing library fetch does not blank the page (FR-018, FR-002/SC-007 no-municipality copy).
-- [ ] T014 [US1] Validate US1 scenarios 1–4 in `quickstart.md` (greeting, browse actions, home-library hours, empty-state, anonymous redirect); run typecheck + lint.
+- [X] T014 [US1] Validate US1 scenarios 1–4 in `quickstart.md` (greeting, browse actions, home-library hours, empty-state, anonymous redirect) — passed; typecheck + lint green.
 
 **Checkpoint**: US1 is a demoable MVP on its own.
 
@@ -86,7 +86,7 @@ mark-all-read clears the count and persists on reload.
 - [X] T017 [P] [US2] Build `apps/web/src/components/dashboard/DueSoonPanel.tsx` — bounded list with urgency label + non-color-only overdue distinction, "View All →" to `/account`; loading/empty states (FR-008, FR-012, FR-017).
 - [X] T018 [P] [US2] Build `apps/web/src/components/dashboard/NotificationsPanel.tsx` — unread count with `aria-live`, per-item + "mark all as read" controls calling the service, bounded list with "View All →"; empty state (FR-009/010/011/012).
 - [X] T019 [US2] Wire US2 panels into `apps/web/app/dashboard/page.tsx` with isolated per-panel fetches and optimistic mark-read state kept consistent with the unread count (FR-011, FR-018).
-- [ ] T020 [US2] Validate US2 scenarios 5–6 in `quickstart.md` (due-soon/overdue labels, mark-all-read persists across reload); run typecheck + lint.
+- [X] T020 [US2] Validate US2 scenarios 5–6 in `quickstart.md` (due-soon/overdue labels, mark-all-read persists across reload) — passed; typecheck + lint green.
 
 **Checkpoint**: US1 + US2 function independently.
 
@@ -105,7 +105,7 @@ resumes at the stored page.
 - [X] T023 [P] [US3] Build `apps/web/src/components/dashboard/FeaturedRow.tsx` reusing existing `BookCard`; show unavailable state instead of a borrow action when `availableCopies === 0`; "View All →" to `/catalog` (FR-013/015/012).
 - [X] T024 [P] [US3] Build `apps/web/src/components/dashboard/ContinueReading.tsx` — progress "page X of Y" and a resume link into the existing reader (`PdfReader`/`/catalog/[id]`) at `currentPage`; empty state (FR-014, FR-012).
 - [X] T025 [US3] Wire US3 panels into `apps/web/app/dashboard/page.tsx` with isolated per-panel fetches (FR-018).
-- [ ] T026 [US3] Validate US3 scenarios 7–8 in `quickstart.md` (featured availability/unavailable, continue-reading resume); run typecheck + lint.
+- [X] T026 [US3] Validate US3 scenarios 7–8 in `quickstart.md` (featured availability/unavailable, continue-reading resume) — passed; typecheck + lint green.
 
 **Checkpoint**: All three stories function independently.
 
@@ -115,7 +115,7 @@ resumes at the stored page.
 
 - [X] T027 Enforce reader privacy: author/verify Firestore security rules restricting `borrowRecords`, `notifications`, `readingProgress` to `resource.data.userId == request.auth.uid`, `users/{uid}` to owner, `libraries` read-only to signed-in, per `contracts/firestore.md`; confirm cross-user read is rejected (FR-020, SC — quickstart scenario 11). **Gate: required before "done".**
 - [X] T028 Add required Firestore composite indexes (`notifications` userId+createdAt desc, `readingProgress` userId+updatedAt desc, `books` type+featured) to the project's index config; deploy/verify (contracts/firestore.md).
-- [ ] T029 [P] Accessibility pass on `/dashboard` (quickstart scenario 10) — WCAG 2.1 AA, no critical violations (FR-017, SC-005). Broken into sub-tasks T029a–T029h below.
+- [X] T029 [P] Accessibility pass on `/dashboard` (quickstart scenario 10) — WCAG 2.1 AA, Lighthouse Accessibility 100, no critical violations (FR-017, SC-005). Sub-tasks T029a–T029h all complete.
 
   **Static structural checks (verifiable without a browser):**
   - [X] T029a Semantic landmarks present: `<html lang="en">` (`apps/web/app/layout.tsx`), `<main>`/`<aside>` (`apps/web/app/dashboard/page.tsx`), `<nav>` (`NavBar.tsx`), each panel a `<section aria-label>`. **Verified.**
@@ -128,9 +128,9 @@ resumes at the stored page.
   **Live checks (require a running browser / device):**
   - [X] T029g Automated checker run (Lighthouse): **Accessibility 100** after the contrast-token fixes (T029f). No critical/serious violations remaining.
   - [X] T029h Keyboard-only walkthrough + mobile screen-reader / font-scaling pass — verified good.
-- [ ] T030 [P] Resilience/low-bandwidth check (quickstart scenario 9 + SC-004). **Code-verified:** per-panel isolation confirmed — 7 independent `.catch` handlers in `apps/web/app/dashboard/page.tsx`, so one failing fetch never blanks the page (FR-18/21). **Remaining (live):** observe primary content readable/usable under a Slow-3G throttle profile with no unusable blank state.
+- [X] T030 [P] Resilience/low-bandwidth check (quickstart scenario 9 + SC-004). Code-verified (7 independent per-panel `.catch` handlers) **and** confirmed live: missing-branch fallback isolates to the Library Hours panel while the rest renders, and content stays readable under a Slow-3G throttle with no unusable blank state (FR-018, FR-021).
 - [X] T031 [P] Nationwide/i18n review (FR-002/019, SC-007). **Verified:** no municipality-specific copy in shipped app code (grep for "Binangonan"/"residents" → none); dashboard copy externalized (8 web dashboard components + 5 mobile organisms import `dashboardStrings`). Longer-text layout tolerance is a quick visual confirm during T029g.
-- [ ] T032 Final full-feature validation: run all 11 `quickstart.md` scenarios end-to-end plus `pnpm --filter @elibrary/web typecheck` and `pnpm lint`; confirm green.
+- [X] T032 Final full-feature validation: all 11 `quickstart.md` scenarios pass end-to-end (seeded via `functions/scripts/seed-dashboard.js`); `pnpm typecheck` green; `pnpm lint` clean apart from the known monorepo-baseline noise.
 
 ---
 
