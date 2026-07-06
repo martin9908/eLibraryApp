@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Icon, Surface, Text, useTheme } from 'react-native-paper';
 
 import { SectionHeader } from '@/src/components/molecules';
+import { dashboardStrings as S } from '@/src/lib/dashboardStrings';
 import type { DueSoonEntry } from '@/src/types/library';
 
 type DueSoonSectionProps = {
@@ -26,18 +27,18 @@ export function DueSoonSection({ items, loading, onViewAll, onSelect }: DueSoonS
     return (
         <View style={styles.container}>
             <SectionHeader
-                title="Due Soon"
-                actionLabel={items.length > 0 ? 'View all' : undefined}
+                title={S.dueSoon.title}
+                actionLabel={items.length > 0 ? S.dueSoon.viewAll : undefined}
                 onActionPress={items.length > 0 ? onViewAll : undefined}
             />
             <Surface style={styles.card} elevation={2}>
                 {loading ? (
                     <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                        Loading…
+                        {S.dueSoon.loading}
                     </Text>
                 ) : items.length === 0 ? (
                     <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                        Nothing due soon. Enjoy your reading!
+                        {S.dueSoon.empty}
                     </Text>
                 ) : (
                     items.map((item, index) => {
@@ -59,10 +60,14 @@ export function DueSoonSection({ items, loading, onViewAll, onSelect }: DueSoonS
                                         {item.book?.title ?? item.bookId}
                                     </Text>
                                     <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
-                                        Due: {formatDate(item.dueDate?.seconds)}
+                                        {S.dueSoon.dueOn(formatDate(item.dueDate?.seconds))}
                                     </Text>
                                 </View>
-                                <View style={[styles.pill, { backgroundColor: pillBg }]}>
+                                {/* Urgency: icon + text (not color alone) + a11y label — Principle I */}
+                                <View
+                                    style={[styles.pill, { backgroundColor: pillBg }]}
+                                    accessible
+                                    accessibilityLabel={`${item.label}: ${item.book?.title ?? item.bookId}`}>
                                     <Icon
                                         source={overdue ? 'alert-circle' : 'clock-outline'}
                                         size={13}

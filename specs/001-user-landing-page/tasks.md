@@ -115,7 +115,19 @@ resumes at the stored page.
 
 - [X] T027 Enforce reader privacy: author/verify Firestore security rules restricting `borrowRecords`, `notifications`, `readingProgress` to `resource.data.userId == request.auth.uid`, `users/{uid}` to owner, `libraries` read-only to signed-in, per `contracts/firestore.md`; confirm cross-user read is rejected (FR-020, SC — quickstart scenario 11). **Gate: required before "done".**
 - [X] T028 Add required Firestore composite indexes (`notifications` userId+createdAt desc, `readingProgress` userId+updatedAt desc, `books` type+featured) to the project's index config; deploy/verify (contracts/firestore.md).
-- [ ] T029 [P] Accessibility pass on `/dashboard` (quickstart scenario 10): keyboard-only walkthrough, visible focus, landmarks, `aria-live` unread count, alt text on covers, contrast; run an automated checker (Lighthouse/axe) — no critical violations (FR-017, SC-005).
+- [ ] T029 [P] Accessibility pass on `/dashboard` (quickstart scenario 10) — WCAG 2.1 AA, no critical violations (FR-017, SC-005). Broken into sub-tasks T029a–T029h below.
+
+  **Static structural checks (verifiable without a browser):**
+  - [X] T029a Semantic landmarks present: `<html lang="en">` (`apps/web/app/layout.tsx`), `<main>`/`<aside>` (`apps/web/app/dashboard/page.tsx`), `<nav>` (`NavBar.tsx`), each panel a `<section aria-label>`. **Verified.**
+  - [X] T029b Unread count announced: `aria-live="polite"` + `.sr-only` label in `apps/web/src/components/dashboard/NotificationsPanel.tsx`. **Verified.**
+  - [X] T029c Status not conveyed by color alone: urgency pills pair an icon (`::before` ⚠/⏰) + text label in `globals.css` + `DueSoonPanel.tsx`; mobile pills/status have `accessibilityLabel`. **Verified.**
+  - [X] T029d Visible keyboard focus: `.dash-grid a:focus-visible / button:focus-visible` outline in `globals.css`. **Verified.**
+  - [X] T029e Images have alt text: covers use `alt={book.title}` (`ContinueReading.tsx`, `BookCard.tsx`). **Verified.**
+  - [X] T029f **Fixed color contrast:** darkened `--muted` `#8B96AD` (≈2.97:1) → `#6B7488` (≈4.7:1 on white) in `packages/theme/src/palette.ts`, clearing AA 4.5:1 for small text (`.due-date`, `.continue-page`, `.notif-time`, `.panel-empty`). Shared token → web + mobile both benefit. `--ink-soft` `#44506B` (~8:1) already passed.
+
+  **Live checks (require a running browser / device):**
+  - [ ] T029g Run an automated checker (Lighthouse **or** axe DevTools) on `http://localhost:3000/dashboard` (`pnpm --filter @elibrary/web dev`); resolve any critical/serious violations.
+  - [ ] T029h Keyboard-only walkthrough of `/dashboard` (Tab/Shift-Tab/Enter): every action incl. "Mark all as read" reachable, focus order logical, focus visible; and a mobile screen-reader pass (VoiceOver/TalkBack) with dynamic-font-scaling on the Home screen.
 - [ ] T030 [P] Resilience/low-bandwidth check (quickstart scenario 9 + SC-004): verify each panel degrades independently (one failing fetch never blanks the page) and primary content is readable/usable on a throttled Slow-3G profile with no unusable blank state (FR-018, FR-021).
 - [ ] T031 [P] Nationwide/i18n review: confirm no municipality-specific branding or copy remains on the default experience and all dashboard copy is sourced from `dashboardStrings` with layout tolerant of longer text (FR-002/019, SC-007).
 - [ ] T032 Final full-feature validation: run all 11 `quickstart.md` scenarios end-to-end plus `pnpm --filter @elibrary/web typecheck` and `pnpm lint`; confirm green.

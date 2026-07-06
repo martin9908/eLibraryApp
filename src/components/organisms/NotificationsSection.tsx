@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Icon, Surface, Text, useTheme } from 'react-native-paper';
 
 import { SectionHeader } from '@/src/components/molecules';
+import { dashboardStrings as S } from '@/src/lib/dashboardStrings';
 import type { AppNotification, NotificationCategory } from '@/src/types/library';
 
 const CATEGORY_ICON: Record<NotificationCategory, string> = {
@@ -43,18 +44,18 @@ export function NotificationsSection({
     return (
         <View style={styles.container}>
             <SectionHeader
-                title="Notifications"
-                actionLabel={unread > 0 ? 'Mark all as read' : undefined}
+                title={S.notifications.title}
+                actionLabel={unread > 0 ? S.notifications.markAll : undefined}
                 onActionPress={unread > 0 ? onMarkAll : undefined}
             />
             <Surface style={styles.card} elevation={2}>
                 {loading ? (
                     <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                        Loading…
+                        {S.notifications.loading}
                     </Text>
                 ) : items.length === 0 ? (
                     <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                        You are all caught up.
+                        {S.notifications.empty}
                     </Text>
                 ) : (
                     items.map((n, index) => (

@@ -32,7 +32,7 @@ export const colors = {
     // Text (navy-tinted neutrals for an institutional feel)
     ink: '#0C1B3A',
     inkSoft: '#44506B',
-    muted: '#8B96AD',
+    muted: '#6B7488', // darkened for WCAG 2.1 AA: ~4.7:1 on white (was #8B96AD ≈ 2.97:1)
 
     // Lines
     line: '#E4E9F3',

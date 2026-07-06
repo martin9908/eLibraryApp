@@ -64,24 +64,29 @@ export default function BookDetailScreen() {
 
     const handleReturn = useCallback(async () => {
         if (!activeRecord || !book) return;
-        Alert.alert('Return book?', `Return "${book.title}"?`, [
-            { text: 'Cancel', style: 'cancel' },
-            {
-                text: 'Return',
-                style: 'destructive',
-                onPress: async () => {
-                    setActionLoading(true);
-                    try {
-                        await returnBook(activeRecord.id, book.id);
-                        await loadData();
-                    } catch {
-                        Alert.alert('Error', 'Could not return the book. Please try again.');
-                    } finally {
-                        setActionLoading(false);
-                    }
+        const physical = book.type === 'physical';
+        Alert.alert(
+            physical ? 'Cancel reservation?' : 'Return book?',
+            physical ? `Cancel the reservation for "${book.title}"?` : `Return "${book.title}"?`,
+            [
+                { text: 'Keep', style: 'cancel' },
+                {
+                    text: physical ? 'Cancel Reservation' : 'Return',
+                    style: 'destructive',
+                    onPress: async () => {
+                        setActionLoading(true);
+                        try {
+                            await returnBook(activeRecord.id, book.id);
+                            await loadData();
+                        } catch {
+                            Alert.alert('Error', 'Something went wrong. Please try again.');
+                        } finally {
+                            setActionLoading(false);
+                        }
+                    },
                 },
-            },
-        ]);
+            ],
+        );
     }, [activeRecord, book, loadData]);
 
     const handleRead = useCallback(() => {
@@ -177,9 +182,9 @@ export default function BookDetailScreen() {
                         <Text
                             variant="bodySmall"
                             style={{ color: theme.colors.primary, marginTop: 6, fontWeight: '600' }}>
-                            ✓ You have this book borrowed
+                            {isEbook ? '✓ You have this book borrowed' : '✓ Reserved for pickup at your library'}
                             {activeRecord?.dueDate
-                                ? ` · Due ${activeRecord.dueDate.toDate().toLocaleDateString()}`
+                                ? ` · ${isEbook ? 'Due' : 'Hold until'} ${activeRecord.dueDate.toDate().toLocaleDateString()}`
                                 : ''}
                         </Text>
                     )}
@@ -206,7 +211,7 @@ export default function BookDetailScreen() {
                                 icon="keyboard-return"
                                 loading={actionLoading}
                                 disabled={actionLoading}>
-                                Return
+                                {isEbook ? 'Return' : 'Cancel Reservation'}
                             </Button>
                         )}
                         {canBorrow && (
@@ -217,7 +222,7 @@ export default function BookDetailScreen() {
                                 icon="bookmark-plus-outline"
                                 loading={actionLoading}
                                 disabled={actionLoading}>
-                                Borrow
+                                {isEbook ? 'Borrow' : 'Reserve for pickup'}
                             </Button>
                         )}
                         {!isBorrowed && book.availableCopies === 0 && (

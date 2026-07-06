@@ -2,14 +2,15 @@ import { Pressable, StyleSheet, View } from 'react-native';
 import { Icon, Surface, Text, useTheme } from 'react-native-paper';
 
 import { SectionHeader } from '@/src/components/molecules';
+import { dashboardStrings as S } from '@/src/lib/dashboardStrings';
 
 type QuickLink = { key: string; label: string; icon: string };
 
 const LINKS: QuickLink[] = [
-    { key: 'reserve', label: 'Reserve Book', icon: 'bookmark-outline' },
-    { key: 'rules', label: 'Library Rules', icon: 'clipboard-text-outline' },
-    { key: 'guide', label: 'User Guide', icon: 'book-open-outline' },
-    { key: 'contact', label: 'Contact Us', icon: 'email-outline' },
+    { key: 'reserve', label: S.quickLinks.reserve, icon: 'bookmark-outline' },
+    { key: 'rules', label: S.quickLinks.rules, icon: 'clipboard-text-outline' },
+    { key: 'guide', label: S.quickLinks.guide, icon: 'book-open-outline' },
+    { key: 'contact', label: S.quickLinks.contact, icon: 'email-outline' },
 ];
 
 type QuickLinksSectionProps = {
@@ -21,7 +22,7 @@ export function QuickLinksSection({ onSelect }: QuickLinksSectionProps) {
 
     return (
         <View style={styles.container}>
-            <SectionHeader title="Quick Links" />
+            <SectionHeader title={S.quickLinks.title} />
             <View style={styles.grid}>
                 {LINKS.map((link) => (
                     <Pressable

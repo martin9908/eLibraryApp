@@ -2,6 +2,7 @@ import { StyleSheet, View } from 'react-native';
 import { Button, Icon, Surface, Text, useTheme } from 'react-native-paper';
 
 import { SectionHeader } from '@/src/components/molecules';
+import { dashboardStrings as S } from '@/src/lib/dashboardStrings';
 import { isOpenNow } from '@/src/services/firestore/libraryBranchService';
 import type { Library } from '@/src/types/library';
 
@@ -16,23 +17,23 @@ export function LibraryHoursSection({ library, loading, onChooseLibrary }: Libra
 
     return (
         <View style={styles.container}>
-            <SectionHeader title="Library Hours" />
+            <SectionHeader title={S.libraryHours.title} />
             <Surface style={styles.card} elevation={2}>
                 {loading ? (
                     <Text variant="bodyMedium" style={{ color: theme.colors.onSurfaceVariant }}>
-                        Loading…
+                        {S.libraryHours.loading}
                     </Text>
                 ) : !library ? (
                     // Member has not chosen a home library yet (nationwide edge case).
                     <View style={styles.chooseWrap}>
                         <Text variant="titleSmall" style={styles.name}>
-                            Choose your library
+                            {S.libraryHours.chooseTitle}
                         </Text>
                         <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>
-                            Set your home library to see local hours and physical-book availability.
+                            {S.libraryHours.chooseBody}
                         </Text>
                         <Button mode="outlined" onPress={onChooseLibrary} style={styles.chooseBtn}>
-                            Choose a library
+                            {S.libraryHours.chooseCta}
                         </Button>
                     </View>
                 ) : (
@@ -45,14 +46,17 @@ export function LibraryHoursSection({ library, loading, onChooseLibrary }: Libra
                                 const open = isOpenNow(library);
                                 const color = open ? theme.colors.primary : theme.colors.onSurfaceVariant;
                                 return (
-                                    <View style={styles.status}>
+                                    <View
+                                        style={styles.status}
+                                        accessible
+                                        accessibilityLabel={open ? S.libraryHours.openNow : S.libraryHours.closed}>
                                         <Icon
                                             source={open ? 'circle' : 'circle-outline'}
                                             size={12}
                                             color={color}
                                         />
                                         <Text variant="labelMedium" style={{ color, fontWeight: '800' }}>
-                                            {open ? 'Open Now' : 'Closed'}
+                                            {open ? S.libraryHours.openNow : S.libraryHours.closed}
                                         </Text>
                                     </View>
                                 );
@@ -61,7 +65,7 @@ export function LibraryHoursSection({ library, loading, onChooseLibrary }: Libra
                         <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant, marginTop: 6 }}>
                             {library.hours
                                 ? `${library.hours.days}: ${library.hours.open} – ${library.hours.close}`
-                                : 'Hours unavailable'}
+                                : S.libraryHours.hoursUnavailable}
                         </Text>
                         {library.contact ? (
                             <Text variant="bodySmall" style={{ color: theme.colors.onSurfaceVariant }}>

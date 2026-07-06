@@ -64,7 +64,8 @@ export default function BookDetailPage() {
 
     const handleReturn = async () => {
         if (!record || !book) return;
-        if (!confirm(`Return "${book.title}"?`)) return;
+        const verb = book.type === 'physical' ? 'Cancel the reservation for' : 'Return';
+        if (!confirm(`${verb} "${book.title}"?`)) return;
         setActionLoading(true);
         try {
             await returnBook(record.id, book.id);
@@ -90,6 +91,9 @@ export default function BookDetailPage() {
     const isBorrowed = record !== null;
     const canBorrow = !isBorrowed && book.availableCopies > 0;
     const initials = book.title.slice(0, 2).toUpperCase();
+    // Physical titles are reserved for in-branch pickup; eBooks are borrowed to read in-app.
+    // (Hybrid Community Library System — Constitution Principle V: preserve physical libraries.)
+    const isPhysical = book.type === 'physical';
 
     return (
         <>
@@ -134,9 +138,9 @@ export default function BookDetailPage() {
 
                     {isBorrowed && (
                         <div className="borrowed-note">
-                            ✓ You have this book
+                            {isPhysical ? '✓ Reserved for pickup at your library' : '✓ You have this book'}
                             {record?.dueDate
-                                ? ` · Due ${new Date(record.dueDate.seconds * 1000).toLocaleDateString()}`
+                                ? ` · ${isPhysical ? 'Hold until' : 'Due'} ${new Date(record.dueDate.seconds * 1000).toLocaleDateString()}`
                                 : ''}
                         </div>
                     )}
@@ -154,7 +158,9 @@ export default function BookDetailPage() {
                                 className="btn btn-danger"
                                 onClick={handleReturn}
                                 disabled={actionLoading}>
-                                {actionLoading ? 'Returning…' : 'Return Book'}
+                                {actionLoading
+                                    ? (isPhysical ? 'Cancelling…' : 'Returning…')
+                                    : (isPhysical ? 'Cancel Reservation' : 'Return Book')}
                             </button>
                         )}
                         {canBorrow && (
@@ -162,7 +168,11 @@ export default function BookDetailPage() {
                                 className="btn btn-primary"
                                 onClick={handleBorrow}
                                 disabled={actionLoading}>
-                                {actionLoading ? 'Borrowing…' : user ? 'Borrow this book' : 'Sign in to borrow'}
+                                {actionLoading
+                                    ? (isPhysical ? 'Reserving…' : 'Borrowing…')
+                                    : user
+                                        ? (isPhysical ? 'Reserve for pickup' : 'Borrow this book')
+                                        : (isPhysical ? 'Sign in to reserve' : 'Sign in to borrow')}
                             </button>
                         )}
                         {!isBorrowed && book.availableCopies === 0 && (
@@ -172,7 +182,7 @@ export default function BookDetailPage() {
                         )}
                         {!user && canBorrow && (
                             <span className="detail-hint">
-                                <Link href="/login">Sign in</Link> to borrow this title.
+                                <Link href="/login">Sign in</Link> to {isPhysical ? 'reserve' : 'borrow'} this title.
                             </span>
                         )}
                     </div>
