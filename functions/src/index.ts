@@ -5,6 +5,11 @@ import * as functions from 'firebase-functions';
 admin.initializeApp();
 const db = getFirestore();
 
+// ─── RBAC (feature 002) ──────────────────────────────────────────────────────
+// Default new users to Patron (FR-002). Role/scope management callables
+// (assignRole, setAccountStatus, updatePatron, deleteBook) are added in US2/US3.
+export { onUserCreate } from './rbac/onUserCreate';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────

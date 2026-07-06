@@ -14,28 +14,71 @@ import {
     registerForPushNotificationsAsync,
     savePushToken,
 } from '@/src/services/notificationService';
+import type { LibrarianScope, Role } from '@/src/types/library';
 
 type AuthContextValue = {
     user: User | null;
     /** True while Firebase is resolving the initial persisted auth state. */
     initialising: boolean;
+    /** Role from the ID token custom claim (authz source of truth). Defaults 'patron'. */
+    role: Role;
+    /** Librarian scope from the token (empty for patron/admin). */
+    scope: LibrarianScope;
     signIn: (email: string, password: string) => Promise<void>;
     signUp: (email: string, password: string, displayName: string) => Promise<void>;
     signOut: () => Promise<void>;
+    /** Force-refresh the ID token so a just-changed role/scope takes effect. */
+    refreshClaims: () => Promise<void>;
 };
+
+/** Read role + scope from a user's ID token claims (source of truth for authz). */
+async function readClaims(u: User): Promise<{ role: Role; scope: LibrarianScope }> {
+    const res = await u.getIdTokenResult();
+    const claimRole = res.claims.role as Role | undefined;
+    return {
+        role: claimRole ?? 'patron',
+        scope: {
+            assignedLibraryIds: (res.claims.libs as string[] | undefined) ?? undefined,
+            assignedRegion: (res.claims.region as string | undefined) ?? undefined,
+        },
+    };
+}
 
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [initialising, setInitialising] = useState(true);
+    const [role, setRole] = useState<Role>('patron');
+    const [scope, setScope] = useState<LibrarianScope>({});
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
             setUser(firebaseUser);
+            if (firebaseUser) {
+                try {
+                    const { role: r, scope: s } = await readClaims(firebaseUser);
+                    setRole(r);
+                    setScope(s);
+                } catch {
+                    setRole('patron');
+                    setScope({});
+                }
+            } else {
+                setRole('patron');
+                setScope({});
+            }
             setInitialising(false);
         });
         return unsubscribe;
+    }, []);
+
+    const refreshClaims = useCallback(async () => {
+        if (!auth.currentUser) return;
+        await auth.currentUser.getIdToken(true); // force refresh
+        const { role: r, scope: s } = await readClaims(auth.currentUser);
+        setRole(r);
+        setScope(s);
     }, []);
 
     const signIn = useCallback(async (email: string, password: string) => {
@@ -70,8 +113,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, [user]);
 
     const value = useMemo(
-        () => ({ user, initialising, signIn, signUp, signOut }),
-        [user, initialising, signIn, signUp, signOut],
+        () => ({ user, initialising, role, scope, signIn, signUp, signOut, refreshClaims }),
+        [user, initialising, role, scope, signIn, signUp, signOut, refreshClaims],
     );
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

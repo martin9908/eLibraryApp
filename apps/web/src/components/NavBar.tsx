@@ -1,11 +1,12 @@
 'use client';
 
 import { useAuth } from '@/src/context/AuthContext';
+import { canAccessManageArea } from '@/src/lib/access';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 
 export function NavBar() {
-    const { user, signOut } = useAuth();
+    const { user, role, signOut } = useAuth();
     const pathname = usePathname();
     const router = useRouter();
 
@@ -29,6 +30,11 @@ export function NavBar() {
                 <Link href="/catalog" className={`nav-link${pathname.startsWith('/catalog') ? ' active' : ''}`}>
                     Catalog
                 </Link>
+                {user && canAccessManageArea(role) && (
+                    <Link href="/manage" className={`nav-link${pathname.startsWith('/manage') ? ' active' : ''}`}>
+                        Manage
+                    </Link>
+                )}
                 {user && (
                     <Link href="/account" className={`nav-link${pathname === '/account' ? ' active' : ''}`}>
                         Account

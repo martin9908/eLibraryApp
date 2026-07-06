@@ -36,7 +36,7 @@ live in `functions/src/rbac/`; enforcement in `firestore.rules`; shared types in
 
 ## Phase 1: Setup
 
-- [ ] T001 Verify baseline builds: `pnpm install`, `pnpm typecheck` (web + mobile), and `pnpm --filter elibrary-functions build`; record baseline green.
+- [X] T001 Verify baseline builds: `pnpm install`, `pnpm typecheck` (web + mobile), and `pnpm --filter elibrary-functions build`; record baseline green.
 - [ ] T002 [P] Start Firebase emulators (`firebase emulators:start` — firestore/functions/auth per `firebase.json`) and seed per `quickstart.md`: ≥2 `libraries` in different regions, `books` with `libraryId`, and test users (patron; librarian scoped to Library A; admin). **[Requires local emulator.]**
 
 ---
@@ -45,18 +45,18 @@ live in `functions/src/rbac/`; enforcement in `firestore.rules`; shared types in
 
 **⚠️ These define the role model, the enforcement boundary, and the privileged mutation path — every user story depends on them.**
 
-- [ ] T003 Extend `packages/types/src/index.ts`: add `Role` (`'patron'|'librarian'|'admin'`), `AccountStatus` (`'active'|'suspended'`), `LibrarianScope` (`assignedLibraryIds?`, `assignedRegion?`), extend the user profile shape with `role`/`status`/scope, add `libraryId`/`region` to `Book`, and `AuditEntry` — per `data-model.md`.
-- [ ] T004 [P] Mirror the same role/scope/status types + `Book.libraryId` + `AuditEntry` in mobile `src/types/library.ts` (mobile keeps its own local types).
-- [ ] T005 Create `functions/src/rbac/claims.ts` — Admin-SDK helpers to set/clear custom claims (`role`, compact `libs`, `region`) and mirror them onto `users/{uid}` in one operation (research R1/R2).
-- [ ] T006 Create `functions/src/rbac/audit.ts` — append-only writer for `auditLog` (`actorUid`, `actorRole`, `action`, `targetType`, `targetId`, `details`, `createdAt`); Functions-only (contracts/cloud-functions.md, data-model.md).
-- [ ] T007 Create `functions/src/rbac/onUserCreate.ts` — Auth `onCreate` trigger defaulting new users to the Patron claim + `users` mirror (`role:'patron'`, `status:'active'`) (FR-002, research R7); export it from `functions/src/index.ts`.
-- [ ] T008 Add `functions/scripts/bootstrap-admin.js` — one-off secure Admin-SDK script to grant the first `admin` claim + mirror doc to a given UID (research R7); document usage in `quickstart.md`. **[Run once, out-of-band.]**
-- [ ] T009 **Rewrite `firestore.rules`** as the enforcement boundary per `contracts/security-rules.md`: `role()/isAdmin()/isLibrarian()/libInScope()` helpers; owner-only personal collections; `books` writes gated by role + owning-library scope; `users` role/status/scope fields NOT client-writable; `auditLog` server-only; suspended users denied. **Central blocking task.**
-- [ ] T010 Update `firestore.indexes.json` for scoped/audit queries (e.g. `auditLog` by `createdAt` desc; any `books` by `libraryId`) per `contracts/security-rules.md`.
-- [ ] T011 [P] Extend `apps/web/src/context/AuthContext.tsx` to expose `role`, `scope`, `status` from `getIdTokenResult()` and a `refreshClaims()` (force-refresh) for post-change propagation (research R3, contracts/ui-access.md).
-- [ ] T012 [P] Extend mobile `src/context/AuthContext.tsx` the same way (role/scope/status from the ID token + `refreshClaims()`).
-- [ ] T013 [P] Create `apps/web/src/lib/access.ts` — pure capability predicates (`canManageInventory`, `canManagePatrons`, `canManageLibrarians`, `canAccessManageArea`, `inScope`) per `contracts/ui-access.md`.
-- [ ] T014 [P] Create mobile `src/lib/access.ts` mirroring the same predicates (identical behavior — FR-016).
+- [X] T003 Extend `packages/types/src/index.ts`: add `Role` (`'patron'|'librarian'|'admin'`), `AccountStatus` (`'active'|'suspended'`), `LibrarianScope` (`assignedLibraryIds?`, `assignedRegion?`), extend the user profile shape with `role`/`status`/scope, add `libraryId`/`region` to `Book`, and `AuditEntry` — per `data-model.md`.
+- [X] T004 [P] Mirror the same role/scope/status types + `Book.libraryId` + `AuditEntry` in mobile `src/types/library.ts` (mobile keeps its own local types).
+- [X] T005 Create `functions/src/rbac/claims.ts` — Admin-SDK helpers to set/clear custom claims (`role`, compact `libs`, `region`) and mirror them onto `users/{uid}` in one operation (research R1/R2).
+- [X] T006 Create `functions/src/rbac/audit.ts` — append-only writer for `auditLog` (`actorUid`, `actorRole`, `action`, `targetType`, `targetId`, `details`, `createdAt`); Functions-only (contracts/cloud-functions.md, data-model.md).
+- [X] T007 Create `functions/src/rbac/onUserCreate.ts` — Auth `onCreate` trigger defaulting new users to the Patron claim + `users` mirror (`role:'patron'`, `status:'active'`) (FR-002, research R7); export it from `functions/src/index.ts`.
+- [X] T008 Add `functions/scripts/bootstrap-admin.js` — one-off secure Admin-SDK script to grant the first `admin` claim + mirror doc to a given UID (research R7); document usage in `quickstart.md`. **[Run once, out-of-band.]**
+- [X] T009 **Rewrite `firestore.rules`** as the enforcement boundary per `contracts/security-rules.md`: `role()/isAdmin()/isLibrarian()/libInScope()` helpers; owner-only personal collections; `books` writes gated by role + owning-library scope; `users` role/status/scope fields NOT client-writable; `auditLog` server-only; suspended users denied. **Central blocking task.**
+- [X] T010 Update `firestore.indexes.json` for scoped/audit queries (e.g. `auditLog` by `createdAt` desc; any `books` by `libraryId`) per `contracts/security-rules.md`.
+- [X] T011 [P] Extend `apps/web/src/context/AuthContext.tsx` to expose `role`, `scope`, `status` from `getIdTokenResult()` and a `refreshClaims()` (force-refresh) for post-change propagation (research R3, contracts/ui-access.md).
+- [X] T012 [P] Extend mobile `src/context/AuthContext.tsx` the same way (role/scope/status from the ID token + `refreshClaims()`).
+- [X] T013 [P] Create `apps/web/src/lib/access.ts` — pure capability predicates (`canManageInventory`, `canManagePatrons`, `canManageLibrarians`, `canAccessManageArea`, `inScope`) per `contracts/ui-access.md`.
+- [X] T014 [P] Create mobile `src/lib/access.ts` mirroring the same predicates (identical behavior — FR-016).
 - [ ] T015 Rules-emulator harness: add a `test:rules` script + config under `functions/` (or `firestore-tests/`) so `firebase emulators:exec` can run rules assertions (used by every story's verification tasks).
 
 **Checkpoint**: types + claims + trigger + rules + auth-context + access helpers exist; a seeded patron/librarian/admin can sign in and the client can read their role from the token.
@@ -69,8 +69,8 @@ live in `functions/src/rbac/`; enforcement in `firestore.rules`; shared types in
 
 **Independent Test**: Sign in as a patron; browse/borrow/return/read work; no management nav is visible; direct management writes are denied by rules; a new signup defaults to Patron; self-escalation attempts fail.
 
-- [ ] T016 [P] [US1] Create `apps/web/src/components/RequireRole.tsx` — a guard that redirects users lacking a required role away from protected routes (uses `access.ts` + AuthContext).
-- [ ] T017 [P] [US1] Gate the web "Manage" entry point: show it only when `canAccessManageArea(role)` in `apps/web/src/components/NavBar.tsx` (hidden for patrons — FR-011).
+- [X] T016 [P] [US1] Create `apps/web/src/components/RequireRole.tsx` — a guard that redirects users lacking a required role away from protected routes (uses `access.ts` + AuthContext).
+- [X] T017 [P] [US1] Gate the web "Manage" entry point: show it only when `canAccessManageArea(role)` in `apps/web/src/components/NavBar.tsx` (hidden for patrons — FR-011).
 - [ ] T018 [P] [US1] Gate mobile management navigation: register the "Manage" stack/entry only for librarian/admin in `src/navigation/AppNavigator.tsx` (hidden for patrons).
 - [ ] T019 [US1] Rules-emulator tests (T015 harness): patron is **denied** all `books` writes and all `users`/management writes; a patron **cannot** modify `role`/`status`/scope on any doc (incl. their own); patron **can** read catalog and create their own `borrowRecords` (FR-003, FR-007, FR-008, SC-001, SC-002, SC-005).
 - [ ] T020 [US1] Validate US1 in `quickstart.md` scenarios 1–5 (patron features work; no management surfaces; direct writes denied; default patron; no self-escalation); run typecheck + lint.

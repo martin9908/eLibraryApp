@@ -1,59 +1,97 @@
 rules_version = '2';
 
-// eLibrary+ Firestore security rules.
+// Aklatan+ Firestore security rules — the RBAC enforcement boundary (feature 002).
 //
-// Reader privacy is non-negotiable (Constitution Principle IV / spec FR-020):
-// personal collections are readable/writable only by their owner. The public
-// catalog stays readable; library branch info is readable to signed-in members.
+// Authorization reads the caller's role/scope from their ID token custom claims
+// (set only by Cloud Functions via the Admin SDK — the client can never change a
+// role). Reader privacy (feature 001) is preserved: personal collections stay
+// owner-only, never widened for patrons.
+//
+// Roles: admin ⊇ librarian ⊇ patron. Suspended users have no role claim → denied.
 service cloud.firestore {
   match /databases/{database}/documents {
 
-    function isSignedIn() {
-      return request.auth != null;
+    // ── Identity / role helpers (from the token, no extra reads) ──────────────
+    function isSignedIn() { return request.auth != null; }
+    function isOwner(userId) { return isSignedIn() && request.auth.uid == userId; }
+
+    // A suspended account has its role claim cleared, so role() is null → denied.
+    function role() { return isSignedIn() ? request.auth.token.role : null; }
+    function isActive() { return role() != null; }
+    function isAdmin() { return role() == 'admin'; }
+    function isLibrarian() { return role() == 'librarian'; }
+
+    // Librarian scope travels compactly in the token: token.libs (list) / token.region.
+    function libInScope(libraryId, region) {
+      return isAdmin()
+        || (isLibrarian() && (
+              (request.auth.token.libs != null && libraryId in request.auth.token.libs)
+           || (request.auth.token.region != null && region == request.auth.token.region)
+           ));
     }
 
-    function isOwner(userId) {
-      return isSignedIn() && request.auth.uid == userId;
-    }
-
-    // Public catalog — anyone may read; writes are administrative (out of band).
+    // ── Catalog: public read; writes gated by role + owning-library scope ─────
     match /books/{bookId} {
       allow read: if true;
-      allow write: if false;
+      allow create: if libInScope(request.resource.data.libraryId, request.resource.data.region);
+      allow update: if libInScope(resource.data.libraryId, resource.data.region);
+      // Deletion of a book with active loans is routed through the deleteBook
+      // callable (multi-doc invariant); direct delete still requires scope.
+      allow delete: if libInScope(resource.data.libraryId, resource.data.region);
     }
 
-    // Member profile — owner only. Holds homeLibraryId, memberType, push token.
+    // ── Member profile ────────────────────────────────────────────────────────
+    // Owner reads own; admin reads any; librarian reads any (scope enforced in
+    // management functions/UI). Owner may update ONLY non-privileged fields —
+    // role/status/scope are Functions-only (no client escalation, FR-003).
     match /users/{uid} {
-      allow read, write: if isOwner(uid);
+      allow read: if isOwner(uid) || isAdmin() || isLibrarian();
+      allow create: if isOwner(uid)
+        && request.resource.data.get('role', 'patron') == 'patron'
+        && request.resource.data.get('status', 'active') == 'active';
+      allow update: if isOwner(uid)
+        && request.resource.data.diff(resource.data).affectedKeys()
+             .hasOnly(['displayName', 'homeLibraryId', 'memberType', 'expoPushToken', 'updatedAt']);
+      // No client path may write role/status/assignedLibraryIds/assignedRegion.
+      allow delete: if false;
     }
 
-    // Borrow records — owner only. Prevents exposing another member's loans.
+    // ── Borrow records — owner-only for patrons; staff may read for support ───
     match /borrowRecords/{id} {
-      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow read: if (isSignedIn() && resource.data.userId == request.auth.uid)
+        || isAdmin() || isLibrarian();
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow update: if (isSignedIn() && resource.data.userId == request.auth.uid)
+        || isAdmin() || isLibrarian();
+      allow delete: if isAdmin();
     }
 
-    // In-app notifications feed — owner only. Client updates are limited to the
-    // `read` flag (mark-read); no cross-user or arbitrary-field writes.
+    // ── In-app notifications — owner-only; client update limited to `read` ────
     match /notifications/{id} {
-      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow read: if (isSignedIn() && resource.data.userId == request.auth.uid) || isAdmin();
       allow update: if isSignedIn()
         && resource.data.userId == request.auth.uid
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
       allow create, delete: if false; // generated server-side (Cloud Functions)
     }
 
-    // Reading progress — owner only.
+    // ── Reading progress — owner-only ─────────────────────────────────────────
     match /readingProgress/{id} {
-      allow read, write: if isSignedIn() && resource.data.userId == request.auth.uid;
+      allow read: if isSignedIn() && resource.data.userId == request.auth.uid;
       allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isSignedIn() && resource.data.userId == request.auth.uid;
     }
 
-    // Library branches — non-personal; readable to signed-in members.
+    // ── Library branches — readable to signed-in members; admin writes ────────
     match /libraries/{id} {
       allow read: if isSignedIn();
-      allow write: if false; // managed administratively
+      allow write: if isAdmin();
+    }
+
+    // ── Audit log — admin read; NO client writes (Admin SDK bypasses rules) ───
+    match /auditLog/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
     }
   }
 }

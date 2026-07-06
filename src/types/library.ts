@@ -13,6 +13,12 @@ export type Book = {
     ebookUrl?: string;
     coverImage?: string;
     createdAt?: Timestamp;
+    /** Curated flag — eligible for the Featured panel when true and type === 'ebook'. */
+    featured?: boolean;
+    /** Owning library (branch) for RBAC scope. */
+    libraryId?: string;
+    /** Owning library's region, denormalized for scope checks. */
+    region?: string;
 };
 
 export type BorrowRecord = {
@@ -33,10 +39,34 @@ export type BorrowEntry = BorrowRecord & {
 /** Member type shown on the dashboard greeting. */
 export type MemberType = 'Student' | 'Teacher' | 'Parent' | 'Community';
 
+/** RBAC role hierarchy: admin ⊇ librarian ⊇ patron. */
+export type Role = 'patron' | 'librarian' | 'admin';
+
+/** Account lifecycle state; `suspended` denies sign-in and all writes. */
+export type AccountStatus = 'active' | 'suspended';
+
+/** A librarian's management scope (libraries and/or a region). */
+export type LibrarianScope = {
+    assignedLibraryIds?: string[];
+    assignedRegion?: string;
+};
+
+/** Authorization claims carried in the Firebase Auth ID token. */
+export type RoleClaims = {
+    role: Role;
+    libs?: string[];
+    region?: string;
+};
+
 /** Dashboard-relevant fields of the users/{uid} profile document. */
 export type UserProfile = {
     homeLibraryId?: string;
     memberType?: MemberType;
+    // RBAC mirror (source of truth is the Auth custom claim). Functions-only writes.
+    role?: Role;
+    status?: AccountStatus;
+    assignedLibraryIds?: string[];
+    assignedRegion?: string;
 };
 
 /** Weekly service hours for a library branch. */

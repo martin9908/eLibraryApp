@@ -29,6 +29,10 @@ export type Book = {
     createdAt?: FirestoreTimestamp;
     /** Curated flag — when true and type === 'ebook', eligible for the Featured panel. */
     featured?: boolean;
+    /** Owning library (branch) — determines which librarians may manage this item (RBAC). */
+    libraryId?: string;
+    /** Owning library's region, denormalized for scope checks in security rules. */
+    region?: string;
 };
 
 export type BorrowRecord = {
@@ -49,6 +53,49 @@ export type BorrowEntry = BorrowRecord & {
 /** Member type shown on the dashboard greeting. */
 export type MemberType = 'Student' | 'Teacher' | 'Parent' | 'Community';
 
+// ─── RBAC (feature 002) ──────────────────────────────────────────────────────
+
+/** Role hierarchy: admin ⊇ librarian ⊇ patron. */
+export type Role = 'patron' | 'librarian' | 'admin';
+
+/** Account lifecycle state; `suspended` denies sign-in and all writes. */
+export type AccountStatus = 'active' | 'suspended';
+
+/**
+ * A librarian's management scope. A librarian may act on a target when the
+ * target's library is in `assignedLibraryIds` OR the target's library region
+ * equals `assignedRegion`. Admins ignore scope (nationwide).
+ */
+export type LibrarianScope = {
+    assignedLibraryIds?: string[];
+    assignedRegion?: string;
+};
+
+/**
+ * The authorization claims carried in the Firebase Auth ID token (source of
+ * truth for authz). Compact by design so security rules can read them cheaply.
+ */
+export type RoleClaims = {
+    role: Role;
+    /** Assigned library IDs (librarian only). */
+    libs?: string[];
+    /** Assigned region (librarian only). */
+    region?: string;
+};
+
+/** An audit-log entry — written only by Cloud Functions. */
+export type AuditEntry = {
+    id: string;
+    actorUid: string;
+    actorRole: Role;
+    /** e.g. 'role.assign', 'role.revoke', 'patron.suspend', 'book.delete'. */
+    action: string;
+    targetType: 'user' | 'book' | 'library';
+    targetId: string;
+    details?: Record<string, unknown>;
+    createdAt?: FirestoreTimestamp;
+};
+
 /**
  * A member's profile document (users/{uid}). The document also carries fields
  * owned by other features (e.g. expoPushToken); only dashboard-relevant fields
@@ -59,6 +106,15 @@ export type UserProfile = {
     homeLibraryId?: string;
     /** Falls back to a generic "Member" label when unset. */
     memberType?: MemberType;
+    // RBAC mirror (source of truth is the Auth custom claim). Functions-only writes.
+    /** Mirror of the role claim, for querying/UI. Defaults 'patron'. */
+    role?: Role;
+    /** `suspended` denies sign-in and all writes. Defaults 'active'. */
+    status?: AccountStatus;
+    /** Librarian scope — libraries this librarian may manage. */
+    assignedLibraryIds?: string[];
+    /** Librarian scope — region this librarian may manage (all its libraries). */
+    assignedRegion?: string;
 };
 
 /** Weekly service hours for a library branch. */
