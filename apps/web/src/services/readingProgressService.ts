@@ -1,15 +1,37 @@
 import {
     collection,
+    doc,
     getDocs,
     limit,
     orderBy,
     query,
+    serverTimestamp,
+    setDoc,
     where,
 } from 'firebase/firestore';
 
 import { db } from '@/src/lib/firebase';
 import { getBooksByIds } from '@/src/services/libraryService';
 import type { ReadingProgress, ReadingProgressEntry } from '@elibrary/types';
+
+/**
+ * Persist a member's reading position (owner-only per security rules). Keyed by
+ * `${userId}_${bookId}` so re-reads update in place. Called by the reader as the
+ * page changes — this is what makes Continue Reading reflect reality.
+ */
+export async function saveReadingProgress(
+    userId: string,
+    bookId: string,
+    currentPage: number,
+    totalPages: number,
+): Promise<void> {
+    if (!userId || !bookId || totalPages <= 0) return;
+    await setDoc(
+        doc(db, 'readingProgress', `${userId}_${bookId}`),
+        { userId, bookId, currentPage, totalPages, updatedAt: serverTimestamp() },
+        { merge: true },
+    );
+}
 
 const READING_PROGRESS = 'readingProgress';
 

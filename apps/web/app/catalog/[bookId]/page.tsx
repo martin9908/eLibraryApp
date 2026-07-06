@@ -7,6 +7,7 @@ import {
     getBookById,
     returnBook,
 } from '@/src/services/libraryService';
+import { saveReadingProgress } from '@/src/services/readingProgressService';
 import type { Book, BorrowRecord } from '@elibrary/types';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
@@ -190,7 +191,14 @@ export default function BookDetailPage() {
             </div>
 
             {readerOpen && book.ebookUrl && (
-                <PdfReader url={book.ebookUrl} title={book.title} onClose={() => setReaderOpen(false)} />
+                <PdfReader
+                    url={book.ebookUrl}
+                    title={book.title}
+                    onClose={() => setReaderOpen(false)}
+                    onProgress={(pageNo, total) => {
+                        if (user) void saveReadingProgress(user.uid, book.id, pageNo, total);
+                    }}
+                />
             )}
         </>
     );

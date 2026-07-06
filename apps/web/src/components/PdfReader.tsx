@@ -17,9 +17,11 @@ type Props = {
     url: string;
     title: string;
     onClose: () => void;
+    /** Reports reading position so it can be persisted (Continue Reading). */
+    onProgress?: (page: number, totalPages: number) => void;
 };
 
-export function PdfReader({ url, title, onClose }: Props) {
+export function PdfReader({ url, title, onClose, onProgress }: Props) {
     const source = useMemo(() => resolveEbookSource(url), [url]);
     const isDrive = source.kind === 'drive';
 
@@ -29,6 +31,12 @@ export function PdfReader({ url, title, onClose }: Props) {
     const [error, setError] = useState<string | null>(null);
     const [loaded, setLoaded] = useState(false);
     const pageWrapRef = useRef<HTMLDivElement>(null);
+
+    // Report progress once the doc is loaded and whenever the page changes.
+    // (Drive-embedded PDFs don't expose page count, so only fire when known.)
+    useEffect(() => {
+        if (loaded && numPages > 0) onProgress?.(page, numPages);
+    }, [page, numPages, loaded, onProgress]);
 
     // Lock body scroll while the reader is open, and wire keyboard shortcuts.
     useEffect(() => {
