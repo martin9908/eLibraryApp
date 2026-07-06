@@ -39,7 +39,7 @@ export const colors = {
     lineStrong: '#CDD6E7',
 
     // Semantic
-    success: '#16A34A',
+    success: '#0E7A38', // darkened for WCAG 2.1 AA: ~5.4:1 on white for small status text (was #16A34A ≈ 3.3:1)
     successBg: '#ECFDF5',
     danger: '#CE1126', // flag red doubles as the alert color
     dangerBg: '#FEF2F2',
