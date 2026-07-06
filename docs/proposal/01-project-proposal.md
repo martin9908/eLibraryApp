@@ -1,43 +1,45 @@
 # Project Proposal — Aklatan+
 
-**A nationwide digital library platform**
+**A Hybrid Community Library System for public library modernization**
 
-**Prepared for**: National Library submission
+**Prepared for**: The National Library of the Philippines (NLP)
 **Date**: 2026-07-06
-**Version**: 0.1 (draft for review)
-**Prepared by**: _[team / organization]_
-**Contact**: _[name / email / office]_
+**Version**: 0.1 (concept for guidance & feedback)
+**Prepared by**: Martin Jaycy Halum — Software Developer (Rizal); 10+ years building mobile & web applications
+**Contact**: martinjaycyhalum@gmail.com · 0976-394-8909
 
-> Placeholders in _[brackets]_ mark information to be supplied by the submitting
-> team (names, dates, figures, official titles) before submission.
+> Figures marked _[indicative]_ (e.g. in the budget) are placeholders to be finalized; they
+> are not quotations.
 
 ---
 
 ## 1. Introduction
 
-Aklatan+ is a cross-platform digital library service (web and mobile) whose purpose is
-to **enhance the nationwide library system while replacing its aging digital portal**. It
-makes the country's learning resources easier to discover, borrow, and read for students,
-teachers, parents, and the wider community, while local libraries retain ownership of
-their collections, their catalog data, and their relationship with readers.
+Aklatan+ is a **Hybrid Community Library System** (web and mobile) whose purpose is to help
+public libraries **modernize their services by seamlessly integrating traditional library
+operations with digital library technologies**. It makes the country's learning resources
+easier to discover, borrow, and read for students, teachers, parents, and the wider
+community, **while preserving and strengthening the role of physical libraries** — local
+libraries retain ownership of their collections, their catalog data, and their relationship
+with readers.
 
-This initiative is a **full modernization of the national eLibrary — Aklatan+ is the
-successor platform to elib.gov.ph.** The Philippines already invested in a national digital
-library, but the current portal is dated and limited (discovery and reserve-for-pickup
-only). Aklatan+ **migrates and carries forward** that investment — the collections,
-digitized Filipiniana, and institutional partnerships — into a modern, mobile-first
-platform that adds the capability the current system does not offer: **borrowing and
-reading eBooks directly in-app**, alongside a personalized, accessible member experience.
-The legacy software is retired; the mission, holdings, and partnerships are preserved and
-elevated.
+**Posture — complement and align, not replace.** Aklatan+ is offered as a practical,
+sustainable contribution to public library modernization. It is designed to **complement
+existing library systems and initiatives** and to **align with the National Library's
+standards and long-term direction**. The concept was initially presented to a local
+government unit as an enhancement to its e-library initiative; while it was not pursued at
+the local level, that experience motivated further development and a respectful request for
+the **National Library's guidance** to ensure alignment with national standards and the
+vision for public library modernization in the Philippines.
 
-> **A note on "enhance, not replace":** the project's guiding principle is to enhance the
-> library *system* — the institution, its mission, and its collections — never to diminish
-> it. Replacing the **outdated software portal** is fully consistent with that principle:
-> what is retired is aging technology, not the library, its content, or its partnerships.
+**A note on heritage.** In spirit, Aklatan+ carries forward the vision of the landmark 2004
+**Philippine eLib** project — access to information for life-long learning, enriched local
+digital content, and a nationwide library network (see `04-comparison-elib-gov-ph.md`). The
+intent is to help realize that enduring vision with modern technology, **in cooperation with
+the institutions that have long advanced it** — not to supersede them.
 
 This proposal describes the problem, the proposed solution, its scope, the value it
-delivers, how it is governed, and what we ask of the National Library to proceed.
+delivers, how it is governed, and the guidance sought from the National Library.
 
 ## 2. Background & problem statement
 
@@ -160,13 +162,13 @@ _(Full text: `.specify/memory/constitution.md`.)_
 
 | Risk | Mitigation |
 |------|------------|
-| Perceived as replacing local libraries | Local libraries keep ownership and branding of their branch context; what is replaced is the aging national *portal*, not local branches |
-| Consortium concern over retiring elib.gov.ph | Frame as modernization: migrate collections/partnerships, preserve the consortium's mission and credit; secure NLP/consortium buy-in before retirement |
+| Perceived as replacing existing libraries/initiatives | Explicitly positioned to **complement**, not replace; local libraries keep ownership and branding; physical libraries preserved; alignment with NLP sought up front |
+| Duplicating existing national efforts | Seek NLP guidance early to align with, and build on, existing initiatives rather than overlap them |
 | Reader privacy concerns | Privacy by design; owner-only access enforced by security rules; minimal data collection |
 | Content licensing / copyright | Only licensed content is surfaced; no feature enables unauthorized redistribution |
 | Low-connectivity exclusion | Accessibility & low-bandwidth resilience are release requirements, not add-ons |
 | Long-term cost/sustainability | Managed cloud with usage-based cost; total cost of ownership weighed in every decision |
-| Adoption | Supervised pilot with a few libraries before nationwide rollout |
+| Adoption | Guidance-led pilot with a few libraries before any wider rollout |
 
 ## 10. Success criteria
 
@@ -177,12 +179,18 @@ volume. _(See document 03 for the pilot metrics plan.)_
 
 ## 11. The ask
 
-We request the National Library's endorsement to:
+Respectfully, we seek the **National Library's guidance and feedback**, specifically:
 
-1. Proceed to a **supervised pilot** with _[N]_ participating libraries.
-2. Establish a **data-sharing agreement** for catalog and membership data.
-3. Designate a **point of contact** within the library system for the pilot.
-4. Agree on **success metrics** and a review checkpoint at the end of the pilot.
+1. **Recommendations** on how Aklatan+ can better align with the NLP's standards, existing
+   initiatives, and future direction for public library services.
+2. An opportunity to **present the concept** and provide the complete proposal and
+   supporting presentation materials.
+3. Guidance on a **possible guidance-led pilot** with a small set of interested libraries,
+   should the NLP find the direction worthwhile — including any data-sharing arrangements
+   and a point of contact.
+
+The aim is to learn from the National Library's expertise and contribute, in a modest and
+practical way, to the modernization of library services across the country.
 
 ## 12. Appendices
 

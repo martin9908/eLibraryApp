@@ -1,37 +1,64 @@
 <!--
 Sync Impact Report
 ==================
-Version change: (uninitialized template) → 1.0.0
-Bump rationale: Initial ratification. First concrete constitution replacing the
-                placeholder template. Establishes five governing principles and
-                supporting sections.
+Version change: 1.0.0 → 1.1.0
+Bump rationale: MINOR amendment. Adds a Purpose & Posture preamble and materially
+                expands Principle V to reflect the collaborative, guidance-seeking
+                approach communicated to the National Library of the Philippines
+                (NLP): Aklatan+ is a Hybrid Community Library System that COMPLEMENTS
+                and helps MODERNIZE public libraries, PRESERVES the role of physical
+                libraries, and SEEKS ALIGNMENT with national standards and NLP's
+                direction — it does not seek to replace existing services.
 
-Principles defined (5):
+Renamed: title "eLibrary+ Constitution" → "Aklatan+ Constitution" (product name;
+         the platform was previously referred to as eLibrary+).
+
+Principles (5, unchanged in number):
   I.   Accessibility First
   II.  Inclusivity for All
   III. Purposeful Innovation
   IV.  Security & Privacy by Design
-  V.   Community Service & Sustainability
+  V.   Community Service & Sustainability  (expanded: hybrid, preserve physical
+       libraries, align with national standards)
 
 Added sections:
+  - Purpose & Posture (preamble)  [NEW in 1.1.0]
   - Platform Integrity & Intellectual Property (Additional Constraints)
   - Development Workflow & Quality Gates
   - Governance
 
-Removed sections: None (all template placeholders replaced)
+Removed sections: None
 
 Templates requiring updates:
-  ✅ .specify/templates/plan-template.md      — Constitution Check gate is generic
-                                                ("[Gates determined based on constitution file]");
-                                                no principle names hardcoded, remains aligned.
+  ✅ .specify/templates/plan-template.md      — Constitution Check gate is generic; aligned.
   ✅ .specify/templates/spec-template.md       — No constitution-specific tokens; aligned.
   ✅ .specify/templates/tasks-template.md      — No constitution-specific tokens; aligned.
   ✅ .specify/templates/checklist-template.md  — No constitution-specific tokens; aligned.
 
-Follow-up TODOs: None. Ratification date set to project constitution creation date.
+Follow-up TODOs: None.
 -->
 
-# eLibrary+ Constitution
+# Aklatan+ Constitution
+
+## Purpose & Posture
+
+**Aklatan+** is a **Hybrid Community Library System** that helps public libraries modernize
+by seamlessly integrating traditional library operations with digital library technologies.
+Its posture toward the existing library system is **collaborative, not disruptive**:
+
+- It **complements and helps modernize** existing library services; it does not seek to
+  replace the National Library, its partner institutions, or existing initiatives.
+- It **preserves and strengthens the role of physical libraries** within their communities,
+  unifying physical and digital collections rather than displacing either.
+- It **seeks the guidance of, and alignment with, the National Library of the Philippines**
+  — its standards, existing initiatives, and long-term direction for public library
+  modernization.
+- It aims to be a **practical, sustainable contribution** adaptable by public libraries,
+  educational institutions, and local government units.
+
+This posture governs how every principle below is interpreted: where a decision could read
+as replacing or diminishing existing library services, the collaborative, complementary
+reading always prevails.
 
 ## Core Principles
 
@@ -86,14 +113,23 @@ read; a single breach of reader privacy is an institutional, not just technical,
 ### V. Community Service & Sustainability
 
 The platform exists to enhance — never replace — the existing nationwide library system,
-and every decision MUST serve that mission. Solutions MUST be affordable to operate and
-maintainable by the library's own staff over the long term; total cost of ownership and
-operational burden MUST be weighed in every significant technical decision. Intellectual
-property and licensing terms of hosted content MUST be respected. The platform MUST
-remain beneficial and sustainable for future generations of users and maintainers.
+and every decision MUST serve that mission. As a **Hybrid Community Library System**, it
+MUST **preserve and strengthen the role of physical libraries** while extending digital
+access — unifying physical and digital collections, never displacing either. It MUST
+**complement existing library systems and initiatives** and be designed to **align with the
+National Library of the Philippines' standards and direction**, actively **seeking the
+library community's guidance** rather than presuming to supersede it. Solutions MUST be
+affordable to operate and maintainable by the library's own staff over the long term; total
+cost of ownership and operational burden MUST be weighed in every significant technical
+decision. Intellectual property and licensing terms of hosted content MUST be respected.
+The platform MUST remain beneficial and sustainable for future generations of users and
+maintainers, and MUST be adaptable by public libraries, educational institutions, and local
+government units.
 
-**Rationale**: A system that libraries cannot afford, staff, or sustain does not serve
-the community regardless of its features.
+**Rationale**: A system that libraries cannot afford, staff, or sustain — or one that
+sidelines physical libraries or ignores national standards — does not serve the community
+regardless of its features. Durable adoption comes from partnership and alignment, not
+disruption.
 
 ## Platform Integrity & Intellectual Property
 
@@ -136,4 +172,4 @@ affected templates or artifacts. Versioning follows semantic versioning:
 Compliance is reviewed at each feature review and at release. Violations MUST be resolved
 or explicitly justified in the plan's Complexity Tracking section before proceeding.
 
-**Version**: 1.0.0 | **Ratified**: 2026-07-06 | **Last Amended**: 2026-07-06
+**Version**: 1.1.0 | **Ratified**: 2026-07-06 | **Last Amended**: 2026-07-06

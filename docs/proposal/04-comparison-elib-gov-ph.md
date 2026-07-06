@@ -4,12 +4,15 @@
 **Date**: 2026-07-06
 **Status**: Draft for review
 
-> This comparison is based on **publicly available information** about the Philippine eLib
-> as of July 2026 (see Sources). It is written to show how Aklatan+ **complements** the
-> existing national eLibrary — consistent with our governing principle to *enhance, not
-> replace* the country's library system — not to disparage it. Where a fact could not be
-> confirmed publicly, it is marked _(unverified)_ and should be checked with the NLP before
-> submission.
+> This document frames Aklatan+ as a **modern spiritual successor** to the Philippine eLib —
+> in the sense of **carrying forward its 2004 vision** (life-long learning, enriched local
+> digital content, a nationwide library network) with today's technology. Aklatan+ is offered
+> to **complement and help modernize** existing services in cooperation with the National
+> Library — **not** to replace the eLib, its partner institutions, or their initiatives, and
+> not to diminish the role of physical libraries. Historical facts below are drawn from the
+> **eLib project's own documentation** (provided by the submitting team); other details are
+> from **publicly available sources** as of July 2026 (see Sources). Items that could not be
+> confirmed are marked _(unverified)_ and should be checked with the NLP before submission.
 
 ---
 
@@ -40,7 +43,55 @@ cannot read borrowed titles inside the platform. Its lending model is to **reser
 materials for physical pickup** at a library. Reading online is limited to discovery of
 digitized/subscription content rather than a consumer borrow-and-read experience.
 
-## 2. What Aklatan+ is
+## 2. Origins & the original 2004 vision
+
+The Philippine eLib was a landmark, well-funded national undertaking — and Aklatan+ seeks to
+carry its vision forward. Key facts (from the eLib project documentation):
+
+- **One of the first eleven** government-funded projects under the Information Technology and
+  E-Commerce Council (ITECC), later the Commission on Information and Communication Technology
+  (CICT).
+- **Conceptualized in mid-2003** through the efforts of then DOST Undersecretary Hon.
+  Fortunato T. dela Peña; the project proposal was **approved by the Council in December
+  2003**.
+- **Total implementation budget: PhP 166,770,000.00** for a one-year period.
+- **Officially launched via a Memorandum of Agreement (MOA) signed on February 4, 2004** by
+  the heads of the participating agencies.
+
+**Organizational structure**: five government agencies — the National Library of the
+Philippines (NLP), University of the Philippines (UP), Commission on Higher Education (CHED),
+Department of Science and Technology (DOST), and Department of Agriculture (DA) — each seated
+on a **Steering Committee** that set policy. The project had **six interrelated components**
+(each with a team leader), with the **NLP serving as the Project Management Office (PMO)**,
+its Director as Manager.
+
+### The original objectives — and how Aklatan+ fulfills them today
+
+Aklatan+ is a **modern spiritual successor**: it re-commits to the same 2004 objectives,
+delivered with today's technology.
+
+| Original eLib objective (2004) | How Aklatan+ carries it forward |
+|--------------------------------|----------------------------------|
+| Provide access to information for **life-long learning** | Mobile-first borrow-and-read for students, teachers, parents, and the wider community — anytime, anywhere |
+| **Enrich local content** in digital format for community & global access | Preserves and surfaces digitized Filipiniana; modern reader + discovery makes local content genuinely usable |
+| **Build local capabilities/expertise** in creating digital information | Role-based tools (Librarian/Admin) let library staff manage inventory and content directly |
+| Provide a **library & information services network** for optimum use of resources | Nationwide platform with per-library (home-library) affiliation connecting branches and members |
+| **Promote exchange of knowledge** among sectors, incl. regional/international users | Web + mobile access; shared national catalog reachable beyond a single branch or region |
+| Establish a **mechanism for sustainability** (income generation) | Affordable usage-based cloud (low TCO); sustainable, staff-maintainable operations (see roadmap) |
+
+### The original salient features — modernized
+
+| Original salient feature | Modern equivalent in Aklatan+ |
+|--------------------------|-------------------------------|
+| Create a "critical mass" of eLibrary infrastructure/services | A working cross-platform build (web + mobile) ready to scale nationwide |
+| Built on current systems & the existing network of participants | Complements existing systems and the participant network; interoperates with current content where the NLP directs (not a replacement ILS) |
+| Emphasis on **Philippine materials** in all formats | Filipiniana and local collections remain first-class; supports eBook + physical |
+| Cooperative acquisition & shared access to e-databases | Shared national catalog + home-library model; licensing respected |
+| Local nodes for better public access | Every phone is now a "local node" — plus branch-level context and hours |
+| Training & skills development for network staff | Enablement materials + intuitive management UI for librarians/admins |
+| Income generation for sustainability | Low-cost, usage-based operating model designed for long-term affordability |
+
+## 3. What Aklatan+ is
 
 Aklatan+ is a **member-facing, cross-platform borrowing-and-reading experience** (web +
 iOS/Android) for the wider public across participating local libraries. Each member has a
@@ -48,14 +99,16 @@ iOS/Android) for the wider public across participating local libraries. Each mem
 can **borrow, return, and read** eBooks in-app and reserve physical books — with
 reader-privacy and role-based access enforced at the data layer.
 
-Aklatan+ is proposed as the **successor platform** to elib.gov.ph: it carries forward the
-eLib's core value — *finding and accessing the country's collections* — and adds what the
-legacy portal cannot do — *borrowing, reading in-app, and the everyday account experience
-for the general public on their phones*. The existing collections, digitized Filipiniana,
-and institutional partnerships are **migrated and preserved**; the dated software is
-**retired**.
+Aklatan+ is framed as a **modern spiritual successor** to elib.gov.ph: it re-commits to the
+eLib's founding 2004 vision — *access to information for life-long learning, enriching local
+digital content, and a nationwide library services network* — and helps realize it with
+today's technology, **in cooperation with the National Library**. It shares the eLib's core
+value (*finding and accessing the country's collections*) and adds capabilities the general
+public increasingly expects (*borrowing, reading in-app, and an everyday account experience
+on their phones*), while **preserving the role of physical libraries** and complementing —
+not replacing — existing services.
 
-## 3. Side-by-side comparison
+## 4. Side-by-side comparison
 
 | Dimension | Philippine eLib (elib.gov.ph) | Aklatan+ |
 |-----------|-------------------------------|----------|
@@ -77,17 +130,17 @@ and institutional partnerships are **migrated and preserved**; the dated softwar
 > Rows marked _(unverified)_ reflect the limits of publicly available information, not
 > confirmed absences. Confirm with the NLP.
 
-## 4. Where they overlap
+## 5. Where they overlap
 
 - Both are **national in ambition** and serve students/researchers.
 - Both provide **search and registration**.
 - Both aim to widen **affordable, convenient access** to library resources.
 
-## 5. How Aklatan+ modernizes and succeeds the eLib
+## 6. How Aklatan+ honors and complements the eLib
 
-Aklatan+ is positioned as the **modern successor** to the aging elib.gov.ph portal —
-replacing outdated software while preserving and elevating the national library's mission,
-collections, and partnerships:
+Aklatan+ is positioned to **carry forward the eLib's vision and complement it** — helping
+modernize public library services under the National Library's guidance, while preserving
+the institution's mission, collections, partnerships, and the role of physical libraries:
 
 1. **Everything the eLib does, plus what it can't** — the eLib lets users *discover and
    reserve materials for physical pickup*; Aklatan+ carries that discovery role forward and
@@ -99,27 +152,31 @@ collections, and partnerships:
 3. **Local libraries, front and center** — the eLib is organized around partner agencies;
    Aklatan+ is organized around each member's **home library**, extending the reach of
    local branches without displacing them.
-4. **Migrate, don't duplicate** — the eLib's existing holdings, digitized Filipiniana, and
-   catalog data are **migrated into** Aklatan+ (or federated during transition) rather than
-   re-created, so no investment or content is lost when the legacy portal is retired.
-   _(Migration/transition mechanism to be planned with the NLP/consortium.)_
+4. **Build on, don't duplicate** — rather than re-create existing holdings, Aklatan+ aims to
+   **align and interoperate** with the eLib's collections and the participant network where
+   the National Library directs, so existing investment is respected and complemented.
+   _(Any content interoperability to be planned with, and led by, the NLP/consortium.)_
 5. **Modern access safeguards** — Aklatan+ adds explicit role-based access (Patron /
    Librarian / Admin) and privacy-by-design enforcement that support safe, delegated
    operation by local library staff.
 
-**Framing for the submission**: this initiative is a **full modernization of the national
-eLibrary — Aklatan+ is the successor platform to elib.gov.ph.** The aging, limited portal
-is retired; its collections, digitized content, and partnerships are migrated and carried
-forward into a modern, mobile-first, read-in-app experience. What is replaced is *outdated
-software* — not the library, its mission, its content, or its institutional partners.
+**Framing for the submission**: Aklatan+ is a **modern spiritual successor** to the
+Philippine eLib — it honors the project's 2004 vision and objectives and helps carry them
+forward with today's technology. Nearly two decades on, the ambition remains right and the
+public increasingly expects mobile-first, read-in-app access. Aklatan+ offers that as a
+**complement** to existing services, developed **in cooperation with and under the guidance
+of the National Library**, preserving the role of physical libraries. It is a contribution
+to modernization — not a replacement for the eLib, its partner institutions, or their
+initiatives.
 
-## 6. Honest limitations of this comparison
+## 7. Honest limitations of this comparison
 
 - Feature details of the eLib evolve; some rows are marked _(unverified)_ and must be
   validated with the NLP before the proposal is submitted.
 - Aklatan+ is at pilot-readiness stage (a working cross-platform build with a pilot to
   follow), whereas the eLib is an established, operating national service. The comparison
-  is about **fit and complementarity**, not maturity.
+  is about **carrying the original vision forward with modern technology**, not about
+  maturity.
 - This document should be reviewed by someone familiar with the current eLib to avoid
   overstating differences.
 

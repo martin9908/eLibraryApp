@@ -39,18 +39,17 @@ committing further. This mirrors the MVP-first principle in the project's govern
 ## 3. Workstreams for the pilot
 
 1. **Integration** — catalog + membership data sharing per participating library.
-2. **Legacy migration** — migrate elib.gov.ph holdings, digitized content, and catalog data
-   into Aklatan+ (or federate during transition); plan the eventual retirement/cutover of
-   the legacy portal with the NLP/consortium so nothing is lost.
+2. **Alignment & interoperability** — with NLP guidance, align with national standards and
+   existing initiatives; explore optional interoperability with current systems/content so
+   Aklatan+ complements rather than duplicates them.
 3. **Data services** — notification-feed generation and reading-progress persistence.
 4. **Compliance** — accessibility audit (automated + manual) and security review.
 5. **Operations** — production environment, monitoring, backup/restore.
 6. **Enablement** — brief materials and support path for pilot library staff.
 
-> **Successor-platform note**: full replacement of elib.gov.ph is a **staged** outcome —
-> pilot → nationwide rollout → content migration → legacy retirement — executed with the
-> consortium, not a big-bang switch-off. Cutover happens only once collections and users are
-> migrated and the platform is proven.
+> **Posture note**: Aklatan+ is offered to **complement and help modernize** existing
+> services under the National Library's guidance — not to replace them. Any pilot or wider
+> rollout proceeds only with NLP endorsement, and preserves the role of physical libraries.
 
 ## 4. Success metrics (baselined during pilot)
 

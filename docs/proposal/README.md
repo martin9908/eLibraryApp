@@ -1,7 +1,9 @@
 # Aklatan+ — Proposal Submission Package
 
-Documents supporting the submission of **Aklatan+**, a nationwide digital library
-platform, to the National Library. Read in order.
+Documents supporting **Aklatan+**, a **Hybrid Community Library System** offered to the
+National Library of the Philippines for **guidance and feedback** — designed to complement
+and help modernize public library services while preserving the role of physical libraries.
+Read in order.
 
 | # | Document | Read this if you want… |
 |---|----------|------------------------|
@@ -9,7 +11,7 @@ platform, to the National Library. Read in order.
 | 01 | [Project Proposal](./01-project-proposal.md) | The full narrative: problem, solution, scope, benefits, governance, the ask |
 | 02 | [Technical Architecture Brief](./02-technical-architecture.md) | How it is built: stack, security/privacy, accessibility, scale, integration |
 | 03 | [Implementation Roadmap & Budget](./03-roadmap-and-budget.md) | Phased rollout, milestones, metrics, indicative cost & sustainability |
-| 04 | [Comparison: Aklatan+ vs. Philippine eLib](./04-comparison-elib-gov-ph.md) | How Aklatan+ complements the existing national eLibrary (elib.gov.ph) |
+| 04 | [Relationship to the Philippine eLib](./04-comparison-elib-gov-ph.md) | How Aklatan+ honors and complements the 2004 eLib vision (carries it forward, does not replace) |
 
 ## Supporting references (in this repository)
 
@@ -19,12 +21,14 @@ platform, to the National Library. Read in order.
 
 ## Before submitting — checklist
 
-- [ ] Replace every _[bracketed placeholder]_ (names, dates, figures, official titles).
-- [ ] Confirm the product name and any co-branding with the National Library.
+- [ ] Verify the eLib heritage facts (2004 launch, PhP 166.77M budget, agencies) against the
+      official source before citing them.
 - [ ] Replace **indicative** budget figures in document 03 with real quotations.
-- [ ] Add contact details and the submitting organization.
+- [ ] Confirm the product name and any co-branding with the National Library.
 - [ ] Have a technical reviewer verify document 02 against the current build.
 - [ ] Export to the required submission format (e.g. PDF/Word) if Markdown is not accepted.
+
+**Prepared by**: Martin Jaycy Halum — Software Developer (Rizal) · martinjaycyhalum@gmail.com · 0976-394-8909
 
 ## A note on accuracy
 

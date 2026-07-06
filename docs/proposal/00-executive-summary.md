@@ -1,11 +1,12 @@
 # Aklatan+ — Executive Summary
 
-**A nationwide digital library platform — the modern successor to elib.gov.ph — that replaces the aging portal while preserving and elevating the library system it serves.**
+**A Hybrid Community Library System that helps public libraries modernize by seamlessly integrating traditional library operations with digital library technologies — designed to complement existing services and preserve the vital role of physical libraries.**
 
-**Prepared for**: National Library submission
+**Prepared for**: The National Library of the Philippines (NLP)
 **Date**: 2026-07-06
-**Status**: Proposal draft
-**Contact**: _[name / email / office]_
+**Status**: Concept for guidance & feedback
+**Prepared by**: Martin Jaycy Halum — Software Developer (Rizal)
+**Contact**: martinjaycyhalum@gmail.com · 0976-394-8909
 
 ---
 
@@ -13,49 +14,62 @@
 
 Millions of students, teachers, parents, and lifelong learners depend on public
 libraries, yet access is limited by distance, opening hours, physical stock, and
-uneven connectivity. Aklatan+ extends the reach of the existing nationwide library
-system by giving every member a single, reliable, secure place to discover, borrow,
-and read — on the web and on their phone — while local libraries keep full ownership
-of their collections and their readers.
+uneven connectivity. Aklatan+ helps public libraries **modernize their services** by
+unifying physical and digital collections in one place a member can reach on the web and
+on their phone — **while preserving and strengthening the role of physical libraries**
+within their communities. Local libraries keep full ownership of their collections and
+their readers.
 
-**Aklatan+ is the successor platform to the aging elib.gov.ph portal.** This is a full
-modernization of the national eLibrary: the country's existing investment — its
-collections, digitized Filipiniana, and institutional partnerships — is **migrated and
-carried forward**, while the outdated, limited legacy software is **retired**. The library
-system, its mission, and its holdings are preserved and elevated; the dated portal is
-replaced with a modern, mobile-first, read-in-app experience.
+## Our posture: complement, not replace
+
+Aklatan+ is offered as a **practical, sustainable contribution** to public library
+modernization — **not** a replacement for the National Library, its partner institutions,
+or existing initiatives. It is built to **complement existing library systems** and to
+**align with the National Library's standards and long-term direction**. The concept was
+first presented to a local government unit as an enhancement to its e-library initiative;
+that experience motivated seeking the National Library's guidance to ensure alignment with
+national standards.
+
+In spirit, Aklatan+ carries forward the vision of the landmark **2004 Philippine eLib**
+project — access to information for life-long learning, enriched local digital content, and
+a nationwide library network — and aims to help realize that vision with today's technology,
+in cooperation with the institutions that have long advanced it.
 
 ## What Aklatan+ is
 
-A cross-platform digital library (web + iOS/Android) where a member can:
+A cross-platform Hybrid Community Library System (web + iOS/Android) offering:
 
-- Browse and search the collection (eBooks and physical titles).
-- Borrow eBooks and read them in-app; reserve physical books at their home library.
-- Track due dates, reading progress, and account notifications from one dashboard.
-- See information for **their** local library — hours, availability — because each
-  member is affiliated with a **home library** rather than a single city.
+- **Unified management** of physical and digital library collections.
+- **Mobile and web access** for library patrons.
+- **Secure digital borrowing** of eBooks and learning materials — with in-app reading.
+- **Automated notifications** for due dates and material availability.
+- **Borrowing history and user account management.**
+- **Library analytics and administrative reporting.**
+- A **scalable architecture** adaptable by public libraries, educational institutions, and
+  local government units.
 
 ## Why it fits a national mandate
 
 Aklatan+ is governed by five non-negotiable principles: **accessibility, inclusivity,
 purposeful innovation, security & privacy, and community service & sustainability**.
 In practice that means WCAG 2.1 AA accessibility, plain-language and multi-language-ready
-interfaces, reader-privacy protected by design, respect for content licensing, and a
-platform local libraries can afford to run and staff for the long term.
+interfaces, reader-privacy protected by design, respect for content licensing, preservation
+of physical libraries, and a platform local libraries can afford to run and staff long-term.
 
 ## Current status (not vaporware)
 
-A working cross-platform build already exists: a Next.js web app and an Expo mobile app
-sharing one design system, backed by managed cloud infrastructure. The member landing
-dashboard — personalized greeting, featured titles, continue-reading, due-soon alerts,
-in-app notifications, and home-library hours — is built on both platforms today.
+A working cross-platform build already exists: a web app and a mobile app sharing one design
+system, backed by managed cloud infrastructure. The member dashboard — personalized
+greeting, featured titles, continue-reading, due-soon alerts, in-app notifications, and
+home-library hours — is built on both platforms today.
 
 ## The ask
 
-Endorsement to proceed to a **supervised pilot** with a small set of participating
-libraries, access to catalog and membership data under a data-sharing agreement, and a
-designated point of contact within the library system. Detailed scope, roadmap, and
-indicative costs follow in the accompanying documents.
+Respectfully, the developer seeks the **National Library's guidance, feedback, and
+recommendations** on how Aklatan+ can best align with the NLP's standards, existing
+initiatives, and future direction for public library services — and welcomes the opportunity
+to **present the concept** and provide the complete proposal and supporting materials upon
+request. Any pilot would proceed only with the NLP's guidance and endorsement.
 
 ## Companion documents
 
@@ -63,4 +77,5 @@ indicative costs follow in the accompanying documents.
 |---|----------|---------|
 | 01 | Project Proposal | Full narrative: problem, solution, scope, benefits, governance |
 | 02 | Technical Architecture Brief | How it is built: stack, security, accessibility, scale |
-| 03 | Implementation Roadmap & Budget | Phased rollout, milestones, indicative cost & sustainability |
+| 03 | Implementation Roadmap & Budget | Phased approach, milestones, indicative cost & sustainability |
+| 04 | Relationship to the Philippine eLib | How Aklatan+ honors and complements the 2004 eLib vision |

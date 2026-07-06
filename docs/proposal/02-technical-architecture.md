@@ -131,19 +131,19 @@ not merely in the client:
   there is no single app server to size.
 - **Shared design system** — new surfaces are added once and inherited by both platforms.
 
-## 9. Integration & migration
+## 9. Integration & interoperability
 
-- Aklatan+ is the **national member-facing platform and the successor to the elib.gov.ph
-  portal** — but it is **not** each local library's internal system of record. Participating
-  libraries keep their existing catalog/ILS.
-- **Legacy portal migration**: the eLib's existing holdings, digitized content, and catalog
-  data are migrated into Aklatan+ (or federated during a transition window) so nothing is
-  lost when the aging portal is retired. Migration scope/mechanism is planned with the
-  NLP/consortium.
+- Aklatan+ is a **complement** to existing library systems — a member-facing hybrid
+  platform, **not** each library's internal system of record. Participating libraries keep
+  their existing catalog/ILS.
+- **Alignment with national standards**: with NLP guidance, Aklatan+ aims to align with
+  existing initiatives and standards, and to **interoperate** with current systems/content
+  where the National Library directs — building on existing efforts rather than duplicating
+  them.
 - **Per-library integration** is via **data sharing** (catalog + membership) under
   agreement; the exact mechanism (export/feed/API) is a pilot deliverable to be agreed per
   library.
-- No migration of any *local library's* system of record is required to begin.
+- No migration or replacement of any library's system of record is required to begin.
 
 ## 10. Quality & operations
 
