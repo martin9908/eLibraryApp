@@ -6,9 +6,11 @@ admin.initializeApp();
 const db = getFirestore();
 
 // ─── RBAC (feature 002) ──────────────────────────────────────────────────────
-// Default new users to Patron (FR-002). Role/scope management callables
-// (assignRole, setAccountStatus, updatePatron, deleteBook) are added in US2/US3.
+// Default new users to Patron (FR-002). Privileged, Admin-SDK-only mutations —
+// the client can never change a role (enforced by security rules).
 export { onUserCreate } from './rbac/onUserCreate';
+export { assignRole } from './rbac/assignRole';   // admin: assign/revoke role + scope (US3)
+export { deleteBook } from './rbac/deleteBook';    // librarian/admin: scoped delete w/ active-loan guard (US2)
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers

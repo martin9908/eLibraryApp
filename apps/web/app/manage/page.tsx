@@ -3,6 +3,7 @@
 import { useAuth } from '@/src/context/AuthContext';
 import { canManageLibrarians } from '@/src/lib/access';
 import { RequireRole } from '@/src/components/RequireRole';
+import Link from 'next/link';
 
 /**
  * Management home for librarians and admins (feature 002, US1 gate).
@@ -28,11 +29,11 @@ function ManageHomeInner() {
             : [scope.assignedRegion, ...(scope.assignedLibraryIds ?? [])].filter(Boolean).join(', ') ||
               'No libraries assigned yet';
 
-    const areas: { key: string; title: string; desc: string; show: boolean }[] = [
-        { key: 'inventory', title: '📚 Inventory', desc: 'Add, edit, and remove titles and copies (US2).', show: true },
-        { key: 'patrons', title: '👥 Patrons', desc: 'View, assist, and manage patron accounts (US2).', show: true },
-        { key: 'librarians', title: '🛡️ Librarians', desc: 'Assign roles and library/region scope (US3).', show: canManageLibrarians(role) },
-        { key: 'audit', title: '🧾 Audit Log', desc: 'Review privileged actions (US3).', show: canManageLibrarians(role) },
+    const areas: { key: string; title: string; desc: string; href?: string; show: boolean }[] = [
+        { key: 'inventory', title: '📚 Inventory', desc: 'Add, edit, and remove titles and copies for your library.', href: '/manage/inventory', show: true },
+        { key: 'patrons', title: '👥 Patrons', desc: 'View, assist, and manage patron accounts (coming soon).', show: true },
+        { key: 'librarians', title: '🛡️ Librarians', desc: 'Assign roles and library/region scope.', href: '/manage/librarians', show: canManageLibrarians(role) },
+        { key: 'audit', title: '🧾 Audit Log', desc: 'Review privileged actions (coming soon).', show: canManageLibrarians(role) },
     ];
 
     return (
@@ -51,12 +52,19 @@ function ManageHomeInner() {
                 <h2 className="section-title">Management areas</h2>
             </div>
             <div className="dash-browse" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
-                {areas.filter((a) => a.show).map((a) => (
-                    <div key={a.key} className="dash-panel" aria-label={a.title}>
-                        <div className="dash-panel-title">{a.title}</div>
-                        <p className="panel-empty">{a.desc}</p>
-                    </div>
-                ))}
+                {areas.filter((a) => a.show).map((a) =>
+                    a.href ? (
+                        <Link key={a.key} href={a.href} className="dash-panel" aria-label={a.title} style={{ textDecoration: 'none' }}>
+                            <div className="dash-panel-title">{a.title}</div>
+                            <p className="panel-empty">{a.desc}</p>
+                        </Link>
+                    ) : (
+                        <div key={a.key} className="dash-panel" aria-label={a.title}>
+                            <div className="dash-panel-title">{a.title}</div>
+                            <p className="panel-empty">{a.desc}</p>
+                        </div>
+                    ),
+                )}
             </div>
 
             <p className="detail-hint" style={{ marginTop: 16 }}>
