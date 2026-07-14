@@ -177,7 +177,37 @@ task-completion rate for first-time borrowers, time to locate and resume a book,
 accessibility conformance (WCAG 2.1 AA), and reduction in due-date-related support
 volume. _(See document 03 for the pilot metrics plan.)_
 
-## 11. The ask
+## 11. Adoption pathway — a low-risk path to "yes"
+
+Guidance is the ask; adoption, if the National Library ever wants it, should be an easy
+decision rather than a leap. Aklatan+ is deliberately structured so that saying yes costs
+little and stays reversible at every step:
+
+- **Nothing to build from scratch.** A working cross-platform build already exists today —
+  this is a review of a working product, not a bet on a roadmap.
+- **No procurement decision required to start.** A guidance-led pilot with a small,
+  willing set of libraries can begin under an informal collaboration or data-sharing
+  agreement; a formal procurement or funding decision, if pursued at all, can come later
+  and only once the pilot has produced evidence.
+- **No lock-in.** Participating libraries keep their existing catalog/ILS as the system of
+  record; Aklatan+ sits alongside it and reads/writes only what a data-sharing agreement
+  permits. Stopping the pilot leaves no system to unwind.
+- **Reversible and observable.** Each phase (see document 03) ends in a defined exit gate
+  the National Library reviews before the next phase begins — security sign-off,
+  accessibility audit, pilot metrics — so the decision to continue is made on evidence, not
+  momentum.
+- **The National Library sets the terms.** Scope, data-sharing conditions, branding,
+  success metrics, and (if ever relevant) funding/IP terms are all decided by the NLP, not
+  presented as a fixed package.
+- **Low ongoing cost if it succeeds.** The usage-based cloud model (document 03) means
+  continuing costs scale with actual adoption rather than requiring large fixed
+  infrastructure investment up front.
+
+In short: the ask today is guidance. The path to adoption, should the National Library want
+one, is already built to be a small, evidence-based, reversible step rather than a large
+commitment.
+
+## 12. The ask
 
 Respectfully, we seek the **National Library's guidance and feedback**, specifically:
 
@@ -188,11 +218,16 @@ Respectfully, we seek the **National Library's guidance and feedback**, specific
 3. Guidance on a **possible guidance-led pilot** with a small set of interested libraries,
    should the NLP find the direction worthwhile — including any data-sharing arrangements
    and a point of contact.
+4. Should the National Library see fit, an openness to discuss **funding, sponsorship, or
+   formal adoption** of Aklatan+ as part of a supported pilot or wider rollout. This is
+   offered, not requested — the developer remains glad to proceed on guidance alone, and any
+   funding or adoption arrangement would be entirely on terms the National Library deems
+   appropriate.
 
 The aim is to learn from the National Library's expertise and contribute, in a modest and
 practical way, to the modernization of library services across the country.
 
-## 12. Appendices
+## 13. Appendices
 
 - **A. Technical Architecture Brief** — `02-technical-architecture.md`
 - **B. Implementation Roadmap & Budget** — `03-roadmap-and-budget.md`

@@ -129,3 +129,18 @@ large fixed capacity up front — a deliberate sustainability choice.
 2. Confirm pilot libraries and data-sharing terms.
 3. Agree success metrics and the end-of-pilot review date.
 4. Review pilot results and decide on nationwide rollout.
+5. Decide whether, and on what terms, the National Library wishes to **fund, sponsor, or
+   formally adopt** Aklatan+ for the pilot or wider rollout. This is offered as an option,
+   not a precondition — the developer is glad to proceed on guidance alone if the NLP
+   prefers, and any funding/adoption arrangement (including IP, licensing, and support
+   terms) would be defined by the National Library.
+
+## 10. A note on funding & adoption
+
+The developer built Aklatan+ independently and is not currently compensated for this work.
+Should the National Library, at its discretion, wish to fund development of the pilot,
+sponsor the project, or formally adopt Aklatan+ as (or as part of) a National Library
+initiative, the developer welcomes that conversation and will work with the NLP to define
+appropriate terms — covering scope, cost, intellectual property, and long-term support. This
+is raised here for completeness and transparency; it is not a condition of providing
+guidance, presenting the concept, or supporting a guidance-led pilot.

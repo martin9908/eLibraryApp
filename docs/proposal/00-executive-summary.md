@@ -63,13 +63,24 @@ system, backed by managed cloud infrastructure. The member dashboard — persona
 greeting, featured titles, continue-reading, due-soon alerts, in-app notifications, and
 home-library hours — is built on both platforms today.
 
+## A low-risk path to "yes"
+
+Guidance is the ask today; adoption, if ever pursued, is deliberately built to be a small,
+reversible step rather than a large commitment: nothing to build from scratch, no
+procurement decision needed to start a pilot, no lock-in of any library's existing
+catalog/ILS, phased exit gates the NLP reviews before each next step, and costs that scale
+with actual usage. _(See document 01, §11, for the full adoption pathway.)_
+
 ## The ask
 
 Respectfully, the developer seeks the **National Library's guidance, feedback, and
 recommendations** on how Aklatan+ can best align with the NLP's standards, existing
 initiatives, and future direction for public library services — and welcomes the opportunity
 to **present the concept** and provide the complete proposal and supporting materials upon
-request. Any pilot would proceed only with the NLP's guidance and endorsement.
+request. Any pilot would proceed only with the NLP's guidance and endorsement. Should the
+National Library see fit, the developer is also open to discussing **funding, sponsorship,
+or formal adoption** of Aklatan+ — offered, not requested, and on terms the NLP deems
+appropriate.
 
 ## Companion documents
 

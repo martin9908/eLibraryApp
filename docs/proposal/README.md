@@ -8,6 +8,7 @@ Read in order.
 | # | Document | Read this if you want… |
 |---|----------|------------------------|
 | 00 | [Executive Summary](./00-executive-summary.md) | The one-page overview for decision-makers |
+| 00b | [Cover Letter / One-Pager](./00b-cover-letter-one-pager.md) | A one-page letter-style proposal for guidance & partnership — send this first |
 | 01 | [Project Proposal](./01-project-proposal.md) | The full narrative: problem, solution, scope, benefits, governance, the ask |
 | 02 | [Technical Architecture Brief](./02-technical-architecture.md) | How it is built: stack, security/privacy, accessibility, scale, integration |
 | 03 | [Implementation Roadmap & Budget](./03-roadmap-and-budget.md) | Phased rollout, milestones, metrics, indicative cost & sustainability |
