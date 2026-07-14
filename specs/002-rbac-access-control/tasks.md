@@ -37,7 +37,7 @@ live in `functions/src/rbac/`; enforcement in `firestore.rules`; shared types in
 ## Phase 1: Setup
 
 - [X] T001 Verify baseline builds: `pnpm install`, `pnpm typecheck` (web + mobile), and `pnpm --filter elibrary-functions build`; record baseline green.
-- [ ] T002 [P] Start Firebase emulators (`firebase emulators:start` — firestore/functions/auth per `firebase.json`) and seed per `quickstart.md`: ≥2 `libraries` in different regions, `books` with `libraryId`, and test users (patron; librarian scoped to Library A; admin). **[Requires local emulator.]**
+- [ ] T002 [P] Start Firebase emulators (`firebase emulators:start` — firestore/functions/auth per `firebase.json`) and seed per `quickstart.md`: ≥2 `libraries` in different regions (e.g. `{ id:'libA', region:'Region1' }`, `{ id:'libB', region:'Region2' }`), `books` with `libraryId` pointing to each, and test users (patron; librarian assigned to Library A via `node functions/scripts/bootstrap-admin.js`; admin). **[Requires local emulator. Run once before validation tasks.]**
 
 ---
 
@@ -57,7 +57,7 @@ live in `functions/src/rbac/`; enforcement in `firestore.rules`; shared types in
 - [X] T012 [P] Extend mobile `src/context/AuthContext.tsx` the same way (role/scope/status from the ID token + `refreshClaims()`).
 - [X] T013 [P] Create `apps/web/src/lib/access.ts` — pure capability predicates (`canManageInventory`, `canManagePatrons`, `canManageLibrarians`, `canAccessManageArea`, `inScope`) per `contracts/ui-access.md`.
 - [X] T014 [P] Create mobile `src/lib/access.ts` mirroring the same predicates (identical behavior — FR-016).
-- [ ] T015 Rules-emulator harness: add a `test:rules` script + config under `functions/` (or `firestore-tests/`) so `firebase emulators:exec` can run rules assertions (used by every story's verification tasks).
+- [X] T015 Rules-emulator harness: (1) `pnpm --filter elibrary-functions add --save-dev @firebase/rules-unit-testing mocha ts-node @types/mocha` in `functions/`; (2) create `functions/src/rbac/__tests__/rules.test.ts` with `initializeTestEnvironment({ projectId:'demo-elibrary', firestore:{ rules: readFileSync('firestore.rules','utf8') } })` scaffolding and a single smoke-test assertion (patron cannot write `books`); (3) add `"test:rules": "mocha --require ts-node/register src/rbac/__tests__/rules.test.ts"` to `functions/package.json` scripts; (4) confirm `firebase emulators:exec --only firestore \"pnpm --prefix functions run test:rules\"` passes.
 
 **Checkpoint**: types + claims + trigger + rules + auth-context + access helpers exist; a seeded patron/librarian/admin can sign in and the client can read their role from the token.
 
@@ -71,9 +71,9 @@ live in `functions/src/rbac/`; enforcement in `firestore.rules`; shared types in
 
 - [X] T016 [P] [US1] Create `apps/web/src/components/RequireRole.tsx` — a guard that redirects users lacking a required role away from protected routes (uses `access.ts` + AuthContext).
 - [X] T017 [P] [US1] Gate the web "Manage" entry point: show it only when `canAccessManageArea(role)` in `apps/web/src/components/NavBar.tsx` (hidden for patrons — FR-011).
-- [ ] T018 [P] [US1] Gate mobile management navigation: register the "Manage" stack/entry only for librarian/admin in `src/navigation/AppNavigator.tsx` (hidden for patrons).
-- [ ] T019 [US1] Rules-emulator tests (T015 harness): patron is **denied** all `books` writes and all `users`/management writes; a patron **cannot** modify `role`/`status`/scope on any doc (incl. their own); patron **can** read catalog and create their own `borrowRecords` (FR-003, FR-007, FR-008, SC-001, SC-002, SC-005).
-- [ ] T020 [US1] Validate US1 in `quickstart.md` scenarios 1–5 (patron features work; no management surfaces; direct writes denied; default patron; no self-escalation); run typecheck + lint.
+- [X] T018 [P] [US1] Gate mobile management navigation in `src/navigation/AppNavigator.tsx`: (a) add `Manage: undefined` to `RootTabParamList` in `src/types/navigation.ts`; (b) create `src/screens/manage/ManageRootScreen.tsx` (placeholder entry screen with "Inventory" + "Patrons" buttons, admin adds "Librarians"); (c) in `TabNavigator`, import `useAuth` + `canAccessManageArea` from `src/lib/access.ts` and conditionally render `<Tab.Screen name="Manage" component={ManageRootScreen} …>` only when `canAccessManageArea(role)` is true (hidden for patrons — FR-011, contracts/ui-access.md).
+- [X] T019 [US1] Rules-emulator tests in `functions/src/rbac/__tests__/rules.test.ts` (T015 harness): assert patron (token `{ role:'patron' }`) is **denied** `books` create/update/delete; denied any write to `users/{uid}.role`, `users/{uid}.status`, `users/{uid}.assignedLibraryIds`; denied write to own doc's role field; **allowed** `borrowRecords` create for own uid; **allowed** `books` read. Cover FR-003, FR-007, FR-008, SC-001, SC-002, SC-005.
+- [ ] T020 [US1] Validate US1 in `quickstart.md` scenarios 1–5 against the running emulator (patron features work; no Manage tab visible; direct book-write denied; new signup defaults to patron; self-role-write denied); run `pnpm typecheck` + `pnpm lint`; confirm green.
 
 **Checkpoint**: Patron tier is safe and demoable on its own — the security baseline everyone builds on.
 
@@ -90,9 +90,9 @@ live in `functions/src/rbac/`; enforcement in `firestore.rules`; shared types in
 - [X] T023 [P] [US2] `functions/src/rbac/deleteBook.ts` — scoped delete with the **active-loans invariant** (refuse/require resolution); audits (FR-015); export from `index.ts`.
 - [X] T024 [US2] Web inventory management: `apps/web/app/manage/inventory/page.tsx` (+ needed components) — create/edit inventory via rules-guarded Firestore writes, delete via `deleteBook`; scoped to the librarian's libraries (FR-009).
 - [X] T025 [US2] Web patron management: `apps/web/app/manage/patrons/page.tsx` — list/view/suspend/edit patrons within scope via `setAccountStatus`/`updatePatron` (FR-009).
-- [ ] T026 [P] [US2] Mobile management screens under `src/screens/manage/` (inventory + patrons), scoped, mirroring the web surfaces (FR-016).
-- [ ] T027 [US2] Rules-emulator tests: librarian **can** write `books` where `libraryId` in scope; **denied** out-of-scope books and out-of-scope patrons; **denied** any `role` change and any librarian/admin management (FR-006/009, SC-003).
-- [ ] T028 [US2] Validate US2 in `quickstart.md` scenarios 6–10; run typecheck + lint.
+- [ ] T026 [P] [US2] Mobile management screens: (a) `src/screens/manage/ManageInventoryScreen.tsx` — list books for librarian's assigned libraries (query `books` where `libraryId in scope`); create via Firestore `addDoc`; edit via `updateDoc`; delete via callable `deleteBook`; scope-filtered using `canManageInventory(role, scope, book)` from `src/lib/access.ts`; admin sees all (FR-009, FR-016); (b) `src/screens/manage/ManagePatientsScreen.tsx` — list patrons (`users` where `homeLibraryId in scope`), view detail, call `setAccountStatus` + `updatePatron` callables; scope-filtered via `canManagePatrons(role, scope, …)`; admin sees all (FR-009). Register both screens in `ManageRootScreen.tsx` (T018). Mirror web surfaces (contracts/ui-access.md).
+- [ ] T027 [US2] Rules-emulator tests in `functions/src/rbac/__tests__/rules.test.ts`: librarian token `{ role:'librarian', libs:['libA'] }` **can** write `books` where `libraryId:'libA'`; **denied** `books` where `libraryId:'libB'`; **denied** any `users.role` write (own or other); **denied** write to a patron outside scope; admin token bypasses all scope checks. Cover FR-006, FR-009, SC-003.
+- [ ] T028 [US2] Validate US2 in `quickstart.md` scenarios 6–10 against the emulator (librarian manages Library A; denied Library B; no role changes; patron features retained); run `pnpm typecheck` + `pnpm lint`; confirm green.
 
 **Checkpoint**: US1 + US2 function independently; librarian confined to scope.
 
@@ -106,11 +106,11 @@ live in `functions/src/rbac/`; enforcement in `firestore.rules`; shared types in
 
 - [X] T029 [P] [US3] `functions/src/rbac/assignRole.ts` — admin-only assign/revoke `patron|librarian|admin` + librarian scope; sets claim + mirror; **refuses to demote/remove the last active admin**; audits (`role.assign`/`role.revoke`) (FR-005/010/012, SC-004/006); export from `index.ts`.
 - [X] T030 [US3] Web librarian management: `apps/web/app/manage/librarians/page.tsx` — admin assigns/revokes roles and library/region scope via `assignRole`; triggers target `refreshClaims()` guidance (FR-005/010).
-- [ ] T031 [P] [US3] Mobile admin management screen under `src/screens/manage/` for role/scope assignment (mirrors web).
+- [ ] T031 [P] [US3] Mobile admin management screen `src/screens/manage/ManageLibrariansScreen.tsx` — admin-only: list users with `role:'librarian'` or `role:'admin'`; assign/revoke librarian role + `assignedLibraryIds`/`assignedRegion` via `assignRole` callable; show assigned scope; disable demote for last admin (surface `failed-precondition` error in plain language); guard with `canManageLibrarians(role)` check. Register in `ManageRootScreen.tsx` (T018) under "Librarians" button (admin only — contracts/ui-access.md).
 - [X] T032 [P] [US3] Audit-log view: `apps/web/app/manage/audit/page.tsx` (admin) reading `auditLog` (FR-013, SC-007); optional scoped view for librarians.
 - [X] T033 [US3] Admin scope-bypass: ensure inventory/patron management UIs allow nationwide action for admins (reuse US2 surfaces with admin capability) (FR-010).
-- [ ] T034 [US3] Rules/functions-emulator tests: admin bypasses scope; `assignRole` last-admin protection holds; audit entries written for role changes; suspended admin cannot act (FR-010/012/013, SC-004/006/007).
-- [ ] T035 [US3] Validate US3 in `quickstart.md` scenarios 11–14; run typecheck + lint.
+- [ ] T034 [US3] Rules/functions-emulator tests in `functions/src/rbac/__tests__/rules.test.ts`: admin token bypasses scope for all `books`/`users` writes; `assignRole` callable refuses last-admin demotion (`failed-precondition`); `assignRole` writes `auditLog` entry with correct `actorUid`, `action:'role.assign'`, `targetId`; suspended token (no `role` claim) is denied all guarded writes. Cover FR-010, FR-012, FR-013, SC-004, SC-006, SC-007.
+- [ ] T035 [US3] Validate US3 in `quickstart.md` scenarios 11–14 against the emulator (admin assigns librarian + scope takes effect within a refresh; admin manages any library; last-admin demotion refused; audit entries present); run `pnpm typecheck` + `pnpm lint`; confirm green.
 
 **Checkpoint**: All three tiers function; nationwide admin + safeguards in place.
 
@@ -118,11 +118,11 @@ live in `functions/src/rbac/`; enforcement in `firestore.rules`; shared types in
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-- [ ] T036 [P] Accessibility (Principle I / WCAG 2.1 AA) pass on all new `manage/*` surfaces (web keyboard/focus/landmarks; mobile `accessibilityLabel`s) — new UI must not regress a11y.
-- [ ] T037 [P] Plain-language denial messaging (Principle II): typed, human-readable errors from callables and guarded UI (e.g. "Only librarians for this library can edit its inventory") per `contracts/*`.
-- [ ] T038 Complete the **rules-emulator test suite** as the security gate: cross-user, cross-scope, escalation, last-admin, suspended — all covered and green (Principle IV; SC-001/003/005/006).
-- [ ] T039 Deploy/verify `firestore.rules` + indexes to the target environment; confirm claims propagation (`getIdTokenResult(true)`) end-to-end.
-- [ ] T040 Full-feature validation: run all 17 `quickstart.md` scenarios (incl. mobile parity scenario 17) + `pnpm typecheck` + `pnpm lint`; confirm green.
+- [ ] T036 [P] Accessibility (Principle I / WCAG 2.1 AA) pass on all new `manage/*` surfaces: web — audit keyboard focus order and ARIA landmarks in `apps/web/app/manage/**`; mobile — add `accessibilityLabel` + `accessibilityRole` props to buttons/inputs in `src/screens/manage/*.tsx`. No regression on existing patron screens.
+- [ ] T037 [P] Plain-language denial messaging (Principle II): map each callable's `permission-denied` / `failed-precondition` error code to a human-readable string in a new `src/lib/errorMessages.ts` (mobile) and `apps/web/src/lib/errorMessages.ts` (web); surface via toast/alert in all management screens. Examples: "Only librarians for this library can edit its inventory", "You cannot remove the last admin account".
+- [ ] T038 Complete the **rules-emulator test suite** as the security gate: expand `functions/src/rbac/__tests__/rules.test.ts` to cover all cross-user, cross-scope, escalation, last-admin, and suspended-account scenarios from `quickstart.md` scenarios 1–17; all assertions must be green (Principle IV; SC-001/003/005/006).
+- [ ] T039 Deploy/verify `firestore.rules` + `firestore.indexes.json` to the target Firebase project (`firebase deploy --only firestore:rules,firestore:indexes`); smoke-test claims propagation end-to-end by calling `getIdTokenResult(true)` after `assignRole` and confirming role/scope reflects in the next request.
+- [ ] T040 Full-feature validation: run all 17 `quickstart.md` scenarios (web + mobile parity for scenarios 1–3, 6–9 per scenario 17) + `pnpm typecheck` + `pnpm lint`; confirm all green; mark feature branch ready for review.
 
 ---
 

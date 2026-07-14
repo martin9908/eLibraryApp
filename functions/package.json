@@ -5,6 +5,7 @@
   "main": "lib/index.js",
   "scripts": {
     "build": "tsc",
+    "test:rules": "mocha --require ts-node/register src/rbac/__tests__/rules.test.ts",
     "serve": "npm run build && firebase emulators:start --only functions",
     "deploy": "firebase deploy --only functions"
   },
@@ -19,7 +20,11 @@
     "firebase-functions": "^7.2.5"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.1",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^26.1.0",
+    "mocha": "^11.7.6",
+    "ts-node": "^10.9.2",
     "typescript": "^6.0.3"
   }
 }

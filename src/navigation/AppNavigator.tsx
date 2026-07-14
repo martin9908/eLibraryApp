@@ -11,15 +11,17 @@ import 'react-native-reanimated';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { HapticTab, IconSymbol } from '@/src/components/atoms';
 import { AuthProvider, useAuth } from '@/src/context/AuthContext';
+import { canAccessManageArea } from '@/src/lib/access';
 import AccountScreen from '@/src/screens/AccountScreen';
+import LoginScreen from '@/src/screens/auth/LoginScreen';
+import RegisterScreen from '@/src/screens/auth/RegisterScreen';
 import BookDetailScreen from '@/src/screens/BookDetailScreen';
 import BorrowHistoryScreen from '@/src/screens/BorrowHistoryScreen';
 import CatalogScreen from '@/src/screens/CatalogScreen';
 import HomeScreen from '@/src/screens/HomeScreen';
+import ManageRootScreen from '@/src/screens/manage/ManageRootScreen';
 import ModalScreen from '@/src/screens/ModalScreen';
 import ReaderScreen from '@/src/screens/ReaderScreen';
-import LoginScreen from '@/src/screens/auth/LoginScreen';
-import RegisterScreen from '@/src/screens/auth/RegisterScreen';
 import { getPaperTheme } from '@/src/theme/paperTheme';
 import type { RootStackParamList, RootTabParamList } from '@/src/types/navigation';
 
@@ -27,6 +29,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<RootTabParamList>();
 
 function TabNavigator() {
+  const { role } = useAuth();
   const colorScheme = useColorScheme();
   const mode = colorScheme === 'dark' ? 'dark' : 'light';
   const theme = getPaperTheme(mode);
@@ -72,6 +75,16 @@ function TabNavigator() {
           tabBarIcon: ({ color }) => <IconSymbol size={26} name="person.fill" color={color} />,
         }}
       />
+      {canAccessManageArea(role) ? (
+        <Tab.Screen
+          name="Manage"
+          component={ManageRootScreen}
+          options={{
+            title: 'Manage',
+            tabBarIcon: ({ color }) => <IconSymbol size={26} name="gearshape.fill" color={color} />,
+          }}
+        />
+      ) : null}
     </Tab.Navigator>
   );
 }

@@ -57,12 +57,27 @@ service cloud.firestore {
     }
 
     // ── Borrow records — owner-only for patrons; staff may read for support ───
+    // Client writes are deliberately narrow: a patron may open a loan (with the
+    // expected fields, starting unreturned) and later mark it returned — nothing
+    // else. Due dates, book/user identity, and any other field are immutable
+    // from the client once created, so a patron cannot forge a due date or
+    // silently mark a loan returned/un-returned outside the one allowed
+    // transition. Staff corrections go through Admin-SDK callables, which
+    // bypass rules entirely.
     match /borrowRecords/{id} {
       allow read: if (isSignedIn() && resource.data.userId == request.auth.uid)
         || isAdmin() || isLibrarian();
-      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
-      allow update: if (isSignedIn() && resource.data.userId == request.auth.uid)
-        || isAdmin() || isLibrarian();
+      allow create: if isSignedIn()
+        && request.resource.data.userId == request.auth.uid
+        && request.resource.data.returned == false
+        && request.resource.data.keys()
+             .hasOnly(['userId', 'bookId', 'type', 'borrowedAt', 'dueDate', 'returned']);
+      allow update: if isAdmin() || isLibrarian()
+        || (isSignedIn() && resource.data.userId == request.auth.uid
+            && resource.data.returned == false
+            && request.resource.data.returned == true
+            && request.resource.data.diff(resource.data).affectedKeys()
+                 .hasOnly(['returned', 'returnedAt']));
       allow delete: if isAdmin();
     }
 

@@ -22,4 +22,5 @@ export type RootTabParamList = {
   Home: undefined;
   Catalog: undefined;
   Account: undefined;
+  Manage: undefined;
 };
