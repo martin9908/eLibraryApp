@@ -36,8 +36,17 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
+# Cloud Functions build output
+functions/lib/
+
+# Next.js (web app)
+.next/
+next-env.d.ts
+
 app-example
 
 # generated native folders
 /ios
 /android
+
+/contexts

@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "eLibraryApp",
+    "name": "Aklatan+",
     "slug": "eLibraryApp",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -9,7 +9,8 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.gnamartin.eLibraryApp"
     },
     "android": {
       "adaptiveIcon": {
@@ -19,10 +20,11 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.gnamartin.eLibraryApp"
     },
     "web": {
-      "output": "static",
+      "output": "single",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
@@ -36,6 +38,15 @@
           "dark": {
             "backgroundColor": "#000000"
           }
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/notification-icon.png",
+          "color": "#0038A8",
+          "sounds": [],
+          "iosDisplayInForeground": true
         }
       ]
     ],

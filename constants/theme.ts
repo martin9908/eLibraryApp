@@ -5,25 +5,36 @@
 
 import { Platform } from 'react-native';
 
-const tintColorLight = '#0a7ea4';
-const tintColorDark = '#fff';
+// Library app theme colors
+const primaryBlue = '#2196F3';
+const accentGreen = '#4CAF50';
+const tintColorLight = primaryBlue;
+const tintColorDark = '#8BD9F3';
 
 export const Colors = {
   light: {
-    text: '#11181C',
-    background: '#fff',
+    text: '#000000',
+    background: '#FFFFFF',
     tint: tintColorLight,
-    icon: '#687076',
-    tabIconDefault: '#687076',
-    tabIconSelected: tintColorLight,
+    icon: '#666666',
+    tabIconDefault: '#999999',
+    tabIconSelected: primaryBlue,
+    primary: primaryBlue,
+    accent: accentGreen,
+    secondary: '#757575',
+    success: accentGreen,
   },
   dark: {
     text: '#ECEDEE',
-    background: '#151718',
+    background: '#1A1A1A',
     tint: tintColorDark,
-    icon: '#9BA1A6',
+    icon: '#B0B0B0',
     tabIconDefault: '#9BA1A6',
     tabIconSelected: tintColorDark,
+    primary: tintColorDark,
+    accent: '#81C784',
+    secondary: '#B0B0B0',
+    success: '#81C784',
   },
 };
 

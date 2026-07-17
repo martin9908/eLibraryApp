@@ -1,0 +1,31 @@
+[debug] [2026-07-14T07:40:12.312Z] ----------------------------------------------------------------------
+[debug] [2026-07-14T07:40:12.314Z] Command:       /Users/martinjaycyhalum/.nvm/versions/node/v25.9.0/bin/node /Users/martinjaycyhalum/.nvm/versions/node/v25.9.0/bin/firebase functions:list --project binangonan-elibrary-app --debug
+[debug] [2026-07-14T07:40:12.314Z] CLI Version:   15.19.1
+[debug] [2026-07-14T07:40:12.314Z] Platform:      darwin
+[debug] [2026-07-14T07:40:12.314Z] Node Version:  v25.9.0
+[debug] [2026-07-14T07:40:12.314Z] Time:          Tue Jul 14 2026 15:40:12 GMT+0800 (Philippine Standard Time)
+[debug] [2026-07-14T07:40:12.314Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-07-14T07:40:12.405Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-07-14T07:40:12.406Z] > authorizing via signed-in user (martinjaycyhalum@gmail.com)
+[debug] [2026-07-14T07:40:12.406Z] [iam] checking project binangonan-elibrary-app for permissions ["cloudfunctions.functions.list","firebase.projects.get","run.services.list"]
+[debug] [2026-07-14T07:40:12.406Z] Checked if tokens are valid: true, expires at: 1784018068981
+[debug] [2026-07-14T07:40:12.406Z] Checked if tokens are valid: true, expires at: 1784018068981
+[debug] [2026-07-14T07:40:12.407Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/binangonan-elibrary-app:testIamPermissions [none]
+[debug] [2026-07-14T07:40:12.407Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/binangonan-elibrary-app:testIamPermissions  x-goog-user-project=binangonan-elibrary-app
+[debug] [2026-07-14T07:40:12.407Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/binangonan-elibrary-app:testIamPermissions {"permissions":["cloudfunctions.functions.list","firebase.projects.get","run.services.list"]}
+[debug] [2026-07-14T07:40:13.335Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/binangonan-elibrary-app:testIamPermissions 200
+[debug] [2026-07-14T07:40:13.336Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/binangonan-elibrary-app:testIamPermissions {"permissions":["cloudfunctions.functions.list","firebase.projects.get","run.services.list"]}
+[debug] [2026-07-14T07:40:13.336Z] Checked if tokens are valid: true, expires at: 1784018068981
+[debug] [2026-07-14T07:40:13.336Z] Checked if tokens are valid: true, expires at: 1784018068981
+[debug] [2026-07-14T07:40:13.336Z] >>> [apiv2][query] GET https://cloudfunctions.googleapis.com/v1/projects/binangonan-elibrary-app/locations/-/functions [none]
+[debug] [2026-07-14T07:40:13.641Z] <<< [apiv2][status] GET https://cloudfunctions.googleapis.com/v1/projects/binangonan-elibrary-app/locations/-/functions 403
+[debug] [2026-07-14T07:40:13.641Z] <<< [apiv2][body] GET https://cloudfunctions.googleapis.com/v1/projects/binangonan-elibrary-app/locations/-/functions {"error":{"code":403,"message":"Cloud Functions API has not been used in project binangonan-elibrary-app before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudfunctions.googleapis.com/overview?project=binangonan-elibrary-app then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.","status":"PERMISSION_DENIED","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"SERVICE_DISABLED","domain":"googleapis.com","metadata":{"containerInfo":"binangonan-elibrary-app","consumer":"projects/binangonan-elibrary-app","activationUrl":"https://console.developers.google.com/apis/api/cloudfunctions.googleapis.com/overview?project=binangonan-elibrary-app","service":"cloudfunctions.googleapis.com","serviceTitle":"Cloud Functions API"}},{"@type":"type.googleapis.com/google.rpc.LocalizedMessage","locale":"en-US","message":"Cloud Functions API has not been used in project binangonan-elibrary-app before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudfunctions.googleapis.com/overview?project=binangonan-elibrary-app then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry."},{"@type":"type.googleapis.com/google.rpc.Help","links":[{"description":"Google developers console API activation","url":"https://console.developers.google.com/apis/api/cloudfunctions.googleapis.com/overview?project=binangonan-elibrary-app"}]}]}}
+[debug] [2026-07-14T07:40:13.641Z] [functions] failed to list functions for binangonan-elibrary-app
+[debug] [2026-07-14T07:40:13.641Z] [functions] Request to https://cloudfunctions.googleapis.com/v1/projects/binangonan-elibrary-app/locations/-/functions had HTTP Error: 403, Cloud Functions API has not been used in project binangonan-elibrary-app before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudfunctions.googleapis.com/overview?project=binangonan-elibrary-app then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.
+[debug] [2026-07-14T07:40:13.713Z] FirebaseError: Request to https://cloudfunctions.googleapis.com/v1/projects/binangonan-elibrary-app/locations/-/functions had HTTP Error: 403, Cloud Functions API has not been used in project binangonan-elibrary-app before or it is disabled. Enable it by visiting https://console.developers.google.com/apis/api/cloudfunctions.googleapis.com/overview?project=binangonan-elibrary-app then retry. If you enabled this API recently, wait a few minutes for the action to propagate to our systems and retry.
+    at responseToError (/Users/martinjaycyhalum/.nvm/versions/node/v25.9.0/lib/node_modules/firebase-tools/lib/responseToError.js:53:12)
+    at RetryOperation._fn (/Users/martinjaycyhalum/.nvm/versions/node/v25.9.0/lib/node_modules/firebase-tools/lib/apiv2.js:333:77)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[error] 
+[error] Error: Failed to list functions for binangonan-elibrary-app
