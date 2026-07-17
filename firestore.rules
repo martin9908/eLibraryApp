@@ -68,6 +68,7 @@ service cloud.firestore {
       allow read: if (isSignedIn() && resource.data.userId == request.auth.uid)
         || isAdmin() || isLibrarian();
       allow create: if isSignedIn()
+        && isActive()
         && request.resource.data.userId == request.auth.uid
         && request.resource.data.returned == false
         && request.resource.data.keys()

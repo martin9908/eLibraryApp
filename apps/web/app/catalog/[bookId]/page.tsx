@@ -10,6 +10,7 @@ import {
 import { saveReadingProgress } from '@/src/services/readingProgressService';
 import type { Book, BorrowRecord } from '@elibrary/types';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -104,8 +105,14 @@ export default function BookDetailPage() {
                 {/* Cover */}
                 <div className="detail-cover">
                     {book.coverImage ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={book.coverImage} alt={book.title} />
+                        <div className="cover-frame">
+                            <Image
+                                src={book.coverImage}
+                                alt={book.title}
+                                fill
+                                sizes="(max-width: 900px) 100vw, 320px"
+                            />
+                        </div>
                     ) : (
                         <div className="detail-cover-fallback">{initials}</div>
                     )}

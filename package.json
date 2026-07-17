@@ -13,7 +13,7 @@
     "functions:serve": "pnpm --filter elibrary-functions serve",
     "functions:deploy": "pnpm --filter elibrary-functions deploy",
     "typecheck": "tsc --noEmit && pnpm --filter @elibrary/web typecheck",
-    "lint": "eslint ."
+    "lint": "eslint . && pnpm --filter @elibrary/web lint"
   },
   "dependencies": {
     "@elibrary/theme": "workspace:*",

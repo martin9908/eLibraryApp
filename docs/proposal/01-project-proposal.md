@@ -209,7 +209,7 @@ commitment.
 
 ## 12. The ask
 
-Respectfully, we seek the **National Library's guidance and feedback**, specifically:
+Respectfully, the developer seeks the **National Library's guidance and feedback**, specifically:
 
 1. **Recommendations** on how Aklatan+ can better align with the NLP's standards, existing
    initiatives, and future direction for public library services.

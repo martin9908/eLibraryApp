@@ -1,4 +1,5 @@
 import type { Book } from '@elibrary/types';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export function BookCard({ book }: { book: Book }) {
@@ -7,8 +8,12 @@ export function BookCard({ book }: { book: Book }) {
         <Link href={`/catalog/${book.id}`} className="book-card">
             <div className="book-cover">
                 {book.coverImage ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={book.coverImage} alt={book.title} />
+                    <Image
+                        src={book.coverImage}
+                        alt={book.title}
+                        fill
+                        sizes="(max-width: 640px) 45vw, 220px"
+                    />
                 ) : (
                     <span>{initials}</span>
                 )}

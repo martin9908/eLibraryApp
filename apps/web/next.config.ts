@@ -6,11 +6,6 @@ import type { NextConfig } from 'next';
 const canvasStub = path.resolve(process.cwd(), 'pdf-canvas-stub.js');
 
 const nextConfig: NextConfig = {
-    // The monorepo root lints with eslint-config-expo (from the RN app), which
-    // lacks the Next.js plugin — so Next's build-time lint can't resolve rules
-    // like @next/next/no-img-element. Skip lint during build; type-checking
-    // still runs. Lint the web app separately once eslint-config-next is added.
-    eslint: { ignoreDuringBuilds: true },
     turbopack: {
         resolveAlias: { canvas: './pdf-canvas-stub.js' },
     },
@@ -25,6 +20,8 @@ const nextConfig: NextConfig = {
             { protocol: 'https', hostname: 'firebasestorage.googleapis.com' },
             // Allow placeholder services in development
             { protocol: 'https', hostname: 'placehold.co' },
+            // Allow Wikia/Fandom cover images used for sample/demo book data
+            { protocol: 'https', hostname: 'static.wikia.nocookie.net' },
         ],
     },
 };

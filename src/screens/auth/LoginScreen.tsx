@@ -127,7 +127,7 @@ export default function LoginScreen({ navigation }: Props) {
 
                     <View style={styles.footer}>
                         <Text variant="bodyMedium" style={styles.footerText}>
-                            Don't have an account?{' '}
+                            Don&apos;t have an account?{' '}
                         </Text>
                         <Button
                             mode="text"

@@ -1,5 +1,6 @@
 import { dashboardStrings as S } from '@/src/lib/dashboardStrings';
 import type { ReadingProgressEntry } from '@elibrary/types';
+import Image from 'next/image';
 import Link from 'next/link';
 
 export function ContinueReading({ items, loading }: { items: ReadingProgressEntry[]; loading: boolean }) {
@@ -29,8 +30,7 @@ export function ContinueReading({ items, loading }: { items: ReadingProgressEntr
                             <Link key={progress.id} href={`/catalog/${progress.bookId}`} className="continue-item">
                                 <span className="continue-thumb">
                                     {book?.coverImage ? (
-                                        // eslint-disable-next-line @next/next/no-img-element
-                                        <img src={book.coverImage} alt={book.title} />
+                                        <Image src={book.coverImage} alt={book.title} fill sizes="44px" />
                                     ) : (
                                         <span>{initials}</span>
                                     )}

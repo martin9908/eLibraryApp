@@ -5,16 +5,17 @@ A cross-platform digital library application built as a **pnpm monorepo**. Users
 ## Monorepo Structure
 
 ```
+App.tsx, src/  — Mobile app (Expo 54 + React Native 0.81), lives at repo root
 apps/
-  mobile/     — Expo 54 + React Native 0.81 app (iOS/Android)
   web/        — Next.js 15 App Router web app
-  backend/    — Fastify 5 API server (stub)
 packages/
   types/      — Shared TypeScript types (Book, User, ApiResponse)
   theme/      — Shared design tokens and gradients
   ui/         — Shared React Native component library (stub)
 functions/    — Firebase Cloud Functions
 ```
+
+There is no bespoke API server on the critical path — the mobile and web apps talk to Firebase (Auth, Firestore, Cloud Functions) directly.
 
 ## Prerequisites
 
@@ -57,7 +58,7 @@ EXPO_PUBLIC_FIREBASE_APP_ID=...
 | Type check | `pnpm typecheck` | All workspaces |
 | Lint | `pnpm lint` | Root ESLint |
 
-## Mobile App (`apps/mobile`)
+## Mobile App (repo root)
 
 Built with Expo 54 + React Navigation 7 + React Native Paper.
 
@@ -131,7 +132,6 @@ Reactotron is enabled in development mode and auto-initializes from `App.tsx`.
 |-------|-----------|
 | Mobile | Expo 54, React Native 0.81, React Navigation 7, React Native Paper |
 | Web | Next.js 15, React 19 |
-| Backend | Fastify 5 (stub) |
 | Database | Firebase Firestore |
 | Auth | Firebase Authentication |
 | Package manager | pnpm 11.9.0 workspaces |

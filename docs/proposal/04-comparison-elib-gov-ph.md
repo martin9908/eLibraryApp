@@ -11,8 +11,12 @@
 > Library — **not** to replace the eLib, its partner institutions, or their initiatives, and
 > not to diminish the role of physical libraries. Historical facts below are drawn from the
 > **eLib project's own documentation** (provided by the submitting team); other details are
-> from **publicly available sources** as of July 2026 (see Sources). Items that could not be
-> confirmed are marked _(unverified)_ and should be checked with the NLP before submission.
+> from **publicly available sources** as of July 2026 (see Sources). The core heritage facts
+> — the five partner agencies, the February 4, 2004 MOA signing, the PhP 166,770,000.00
+> one-year implementation budget, and the U.P. Diliman University Library hosting — were
+> independently cross-checked against elib.gov.ph, web.nlp.gov.ph, and the eLib's own "About"
+> page on 2026-07-14 and matched. Items that could not be independently confirmed today are
+> marked _(unverified)_ and should be checked with the NLP before submission.
 
 ---
 
@@ -186,3 +190,5 @@ initiatives.
 - [Philippine eLibrary — National Library of the Philippines](https://web.nlp.gov.ph/philippine-elibrary/)
 - [eLib: A portal of all things Pinoy — Philstar](https://www.philstar.com/business/technology/2005/05/30/279708/elib-portal-all-things-pinoy)
 - [The Philippine eLib Project — UP Library Bulletin](https://uplibrarybulletin.wordpress.com/2006/06/07/philippine-elib-project/)
+- [About — Philippine eLib](https://elib.nlp-dev.up.edu.ph/about) (accessed 2026-07-14; corroborates budget,
+  MOA date, and partner agencies)

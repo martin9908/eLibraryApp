@@ -3,6 +3,7 @@
 import { useAuth } from '@/src/context/AuthContext';
 import { getAllBorrowRecords, getBooksByIds, returnBook } from '@/src/services/libraryService';
 import type { BorrowEntry } from '@elibrary/types';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -66,8 +67,7 @@ export default function AccountPage() {
             <div key={entry.id} className="history-item">
                 <div className="history-thumb">
                     {entry.book?.coverImage ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img src={entry.book.coverImage} alt={entry.book.title} />
+                        <Image src={entry.book.coverImage} alt={entry.book.title} fill sizes="44px" />
                     ) : (
                         <span>{thumbInitials}</span>
                     )}

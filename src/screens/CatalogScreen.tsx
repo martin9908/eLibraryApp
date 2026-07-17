@@ -35,7 +35,7 @@ export default function CatalogScreen() {
             const type = activeFilter === 'all' ? undefined : activeFilter;
             const result = await getAllBooks({ type });
             setBooks(result);
-        } catch (e) {
+        } catch {
             setError('Unable to load books. Please try again.');
         } finally {
             setLoading(false);

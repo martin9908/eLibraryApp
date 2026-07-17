@@ -50,6 +50,35 @@ describe('Firestore rules RBAC', () => {
                 status: 'active',
                 displayName: 'Other Patron',
             });
+
+            await db.collection('books').doc('book-libb').set({
+                title: 'Seed Book B',
+                libraryId: 'libB',
+                region: 'Region2',
+            });
+
+            await db.collection('notifications').doc('notif-1').set({
+                userId: 'patron-uid',
+                title: 'Due soon',
+                read: false,
+            });
+
+            await db.collection('readingProgress').doc('progress-1').set({
+                userId: 'patron-uid',
+                bookId: 'book-1',
+                position: 42,
+            });
+
+            await db.collection('libraries').doc('libA').set({
+                name: 'Library A',
+                region: 'Region1',
+            });
+
+            await db.collection('auditLog').doc('audit-1').set({
+                action: 'seed',
+                actorUid: 'admin-uid',
+                at: new Date(),
+            });
         });
     });
 
@@ -160,5 +189,189 @@ describe('Firestore rules RBAC', () => {
 
         // Once returned, the client can no longer touch it (e.g. un-return it).
         await assertFails(patronDb.collection('borrowRecords').doc('record-5').update({ returned: false }));
+    });
+
+    it('scopes a librarian to their own library/region for book writes', async () => {
+        const librarianDb = testEnv
+            .authenticatedContext('librarian-uid', { role: 'librarian', libs: ['libA'] })
+            .firestore();
+
+        // In-scope library: create and update succeed.
+        await assertSucceeds(
+            librarianDb.collection('books').doc('book-liba-new').set({
+                title: 'Librarian Added Book',
+                libraryId: 'libA',
+                region: 'Region1',
+            }),
+        );
+        await assertSucceeds(librarianDb.collection('books').doc('book-1').update({ title: 'Updated by Librarian' }));
+
+        // Out-of-scope library (not in token.libs, region mismatch too): denied.
+        await assertFails(
+            librarianDb.collection('books').doc('book-libb-new').set({
+                title: 'Out of Scope Book',
+                libraryId: 'libB',
+                region: 'Region2',
+            }),
+        );
+        await assertFails(librarianDb.collection('books').doc('book-libb').update({ title: 'Nope' }));
+    });
+
+    it('never lets a librarian write privileged user fields, even on their own profile', async () => {
+        await testEnv.withSecurityRulesDisabled(async (context) => {
+            await context.firestore().collection('users').doc('librarian-uid').set({
+                role: 'librarian',
+                status: 'active',
+                displayName: 'Librarian User',
+            });
+        });
+
+        const librarianDb = testEnv
+            .authenticatedContext('librarian-uid', { role: 'librarian', libs: ['libA'] })
+            .firestore();
+
+        // Role/status/scope are Functions-only — denied even for the librarian's own doc.
+        await assertFails(librarianDb.collection('users').doc('librarian-uid').update({ role: 'admin' }));
+        await assertFails(librarianDb.collection('users').doc('librarian-uid').update({ status: 'suspended' }));
+        await assertFails(librarianDb.collection('users').doc('librarian-uid').update({ assignedLibraryIds: ['libA', 'libB'] }));
+        await assertFails(librarianDb.collection('users').doc('librarian-uid').update({ assignedRegion: 'Region1' }));
+
+        // Also denied on another member's profile.
+        await assertFails(librarianDb.collection('users').doc('patron-uid').update({ role: 'librarian' }));
+        await assertFails(librarianDb.collection('users').doc('patron-uid').update({ status: 'suspended' }));
+    });
+
+    it('lets an admin write books regardless of library/region scope', async () => {
+        const adminDb = testEnv.authenticatedContext('admin-uid', { role: 'admin' }).firestore();
+
+        await assertSucceeds(
+            adminDb.collection('books').doc('book-admin-new').set({
+                title: 'Admin Added Book',
+                libraryId: 'libB',
+                region: 'Region2',
+            }),
+        );
+        await assertSucceeds(adminDb.collection('books').doc('book-libb').update({ title: 'Admin Updated' }));
+        await assertSucceeds(adminDb.collection('books').doc('book-libb').delete());
+    });
+
+    it('confines notification updates to the read field, owner-only, no create/delete', async () => {
+        const patronDb = testEnv.authenticatedContext('patron-uid', { role: 'patron' }).firestore();
+        const otherDb = testEnv.authenticatedContext('other-uid', { role: 'patron' }).firestore();
+        const adminDb = testEnv.authenticatedContext('admin-uid', { role: 'admin' }).firestore();
+
+        // Owner can flip `read`.
+        await assertSucceeds(patronDb.collection('notifications').doc('notif-1').update({ read: true }));
+
+        // Owner cannot smuggle in another field alongside `read`.
+        await assertFails(
+            patronDb.collection('notifications').doc('notif-1').update({ read: true, userId: 'other-uid' }),
+        );
+        await assertFails(
+            patronDb.collection('notifications').doc('notif-1').update({ read: true, title: 'Hacked' }),
+        );
+
+        // No client create/delete — server-generated only.
+        await assertFails(
+            patronDb.collection('notifications').doc('notif-new').set({
+                userId: 'patron-uid',
+                title: 'Forged',
+                read: false,
+            }),
+        );
+        await assertFails(patronDb.collection('notifications').doc('notif-1').delete());
+
+        // Another user cannot read or update someone else's notification.
+        await assertFails(otherDb.collection('notifications').doc('notif-1').get());
+        await assertFails(otherDb.collection('notifications').doc('notif-1').update({ read: true }));
+
+        // Admin can read any notification.
+        await assertSucceeds(adminDb.collection('notifications').doc('notif-1').get());
+    });
+
+    it('keeps readingProgress strictly owner-only, with no admin/librarian override', async () => {
+        const otherDb = testEnv.authenticatedContext('other-uid', { role: 'patron' }).firestore();
+        const adminDb = testEnv.authenticatedContext('admin-uid', { role: 'admin' }).firestore();
+        const librarianDb = testEnv
+            .authenticatedContext('librarian-uid', { role: 'librarian', libs: ['libA'] })
+            .firestore();
+
+        await assertFails(otherDb.collection('readingProgress').doc('progress-1').get());
+        await assertFails(otherDb.collection('readingProgress').doc('progress-1').update({ position: 99 }));
+        await assertFails(otherDb.collection('readingProgress').doc('progress-1').delete());
+
+        await assertFails(adminDb.collection('readingProgress').doc('progress-1').get());
+        await assertFails(librarianDb.collection('readingProgress').doc('progress-1').get());
+
+        // Owner retains full access.
+        const patronDb = testEnv.authenticatedContext('patron-uid', { role: 'patron' }).firestore();
+        await assertSucceeds(patronDb.collection('readingProgress').doc('progress-1').get());
+        await assertSucceeds(patronDb.collection('readingProgress').doc('progress-1').update({ position: 99 }));
+    });
+
+    it('lets any signed-in member read libraries, but only admin can write', async () => {
+        const patronDb = testEnv.authenticatedContext('patron-uid', { role: 'patron' }).firestore();
+        const librarianDb = testEnv
+            .authenticatedContext('librarian-uid', { role: 'librarian', libs: ['libA'] })
+            .firestore();
+        const adminDb = testEnv.authenticatedContext('admin-uid', { role: 'admin' }).firestore();
+
+        await assertSucceeds(patronDb.collection('libraries').doc('libA').get());
+        await assertSucceeds(librarianDb.collection('libraries').doc('libA').get());
+
+        await assertFails(patronDb.collection('libraries').doc('libA').update({ name: 'Renamed' }));
+        await assertFails(librarianDb.collection('libraries').doc('libA').update({ name: 'Renamed' }));
+        await assertFails(
+            patronDb.collection('libraries').doc('libC').set({ name: 'New Library', region: 'Region3' }),
+        );
+
+        await assertSucceeds(adminDb.collection('libraries').doc('libA').update({ name: 'Renamed' }));
+        await assertSucceeds(
+            adminDb.collection('libraries').doc('libC').set({ name: 'New Library', region: 'Region3' }),
+        );
+    });
+
+    it('lets admin read the audit log but denies ALL client writes, even from admin', async () => {
+        const adminDb = testEnv.authenticatedContext('admin-uid', { role: 'admin' }).firestore();
+        const patronDb = testEnv.authenticatedContext('patron-uid', { role: 'patron' }).firestore();
+
+        await assertSucceeds(adminDb.collection('auditLog').doc('audit-1').get());
+        await assertFails(patronDb.collection('auditLog').doc('audit-1').get());
+
+        // No client — not even admin — may write the audit log (Admin SDK only).
+        await assertFails(
+            adminDb.collection('auditLog').doc('audit-forged').set({ action: 'forged', actorUid: 'admin-uid' }),
+        );
+        await assertFails(adminDb.collection('auditLog').doc('audit-1').update({ action: 'tampered' }));
+        await assertFails(adminDb.collection('auditLog').doc('audit-1').delete());
+    });
+
+    it('denies a suspended account (no role claim) wherever a role is required', async () => {
+        // Suspended: authenticated (has a uid) but no `role` claim on the token,
+        // mirroring setUserRole() clearing the claim on suspension.
+        const suspendedDb = testEnv.authenticatedContext('patron-uid', {}).firestore();
+
+        // Still cannot manage inventory — role-gated, same as any non-staff caller.
+        await assertFails(
+            suspendedDb.collection('books').doc('book-suspended-new').set({
+                title: 'Suspended Attempt',
+                libraryId: 'libA',
+                region: 'Region1',
+            }),
+        );
+
+        // Cannot open a new loan while suspended — borrowing is the role-gated
+        // own-action a suspension is meant to block (see isActive() gate added
+        // to borrowRecords create).
+        await assertFails(
+            suspendedDb.collection('borrowRecords').doc('record-suspended').set({
+                userId: 'patron-uid',
+                bookId: 'book-1',
+                type: 'ebook',
+                borrowedAt: new Date(),
+                dueDate: new Date(),
+                returned: false,
+            }),
+        );
     });
 });

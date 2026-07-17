@@ -414,12 +414,15 @@ a { color: inherit; }
 .back-link:hover { color: var(--indigo-700); }
 
 .detail-cover { position: sticky; top: 88px; }
-.detail-cover img {
+.detail-cover .cover-frame {
+    position: relative;
     width: 100%;
+    aspect-ratio: 3/4;
     border-radius: var(--r-md);
     box-shadow: var(--shadow-lg);
-    display: block;
+    overflow: hidden;
 }
+.detail-cover img { object-fit: cover; }
 .detail-cover-fallback {
     width: 100%;
     aspect-ratio: 3/4;
@@ -497,6 +500,7 @@ a { color: inherit; }
 }
 .history-item:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
 .history-thumb {
+    position: relative;
     width: 44px;
     height: 58px;
     border-radius: 8px;
@@ -985,6 +989,7 @@ a { color: inherit; }
 }
 .continue-item:hover { border-color: var(--indigo); }
 .continue-thumb {
+    position: relative;
     width: 44px;
     height: 60px;
     flex-shrink: 0;
