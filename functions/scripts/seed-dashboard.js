@@ -36,7 +36,21 @@ if (!uid) {
 
 admin.initializeApp(); // uses GOOGLE_APPLICATION_CREDENTIALS
 const db = admin.firestore();
+const bucket = admin.storage().bucket(process.env.FIREBASE_STORAGE_BUCKET);
 const { Timestamp } = admin.firestore;
+
+// Public-domain PDF used to populate the gated Storage objects for seed ebooks.
+const SAMPLE_PDF_URL = 'https://www.gutenberg.org/files/20228/20228-pdf.pdf';
+
+/** Upload the sample PDF to ebooks/{bookId}.pdf unless it already exists. */
+async function seedEbookObject(bookId) {
+    const file = bucket.file(`ebooks/${bookId}.pdf`);
+    const [exists] = await file.exists();
+    if (exists) return;
+    const res = await fetch(SAMPLE_PDF_URL);
+    if (!res.ok) throw new Error(`sample PDF download failed: ${res.status} ${res.statusText}`);
+    await file.save(Buffer.from(await res.arrayBuffer()), { contentType: 'application/pdf', resumable: false });
+}
 
 const now = Date.now();
 const daysFromNow = (d) => Timestamp.fromDate(new Date(now + d * 24 * 60 * 60 * 1000));
@@ -63,7 +77,7 @@ const books = {
     'seed-book-noli': {
         title: 'Noli Me Tángere', author: 'José Rizal', type: 'ebook', category: 'Fiction',
         availableCopies: 3, totalCopies: 5, featured: true,
-        ebookUrl: 'https://www.gutenberg.org/files/20228/20228-pdf.pdf',
+        ebookStoragePath: 'ebooks/seed-book-noli.pdf', // gated: bytes uploaded below
     },
     'seed-book-elfili': {
         title: 'El Filibusterismo', author: 'José Rizal', type: 'ebook', category: 'Fiction',
@@ -77,11 +91,16 @@ const books = {
     'seed-book-code': {
         title: 'Clean Code', author: 'Robert C. Martin', type: 'ebook', category: 'Reference',
         availableCopies: 2, totalCopies: 4, featured: true,
-        ebookUrl: 'https://www.gutenberg.org/files/20228/20228-pdf.pdf',
+        ebookStoragePath: 'ebooks/seed-book-code.pdf', // gated: bytes uploaded below
     },
 };
 
 async function seed() {
+    // Upload gated eBook bytes to Storage first, so ebookStoragePath resolves.
+    for (const [id, data] of Object.entries(books)) {
+        if (data.ebookStoragePath) await seedEbookObject(id);
+    }
+
     const batch = db.batch();
 
     // Libraries
@@ -144,7 +163,8 @@ async function seed() {
     await batch.commit();
     console.log(`✓ Seeded dashboard data for uid=${uid}`);
     console.log('  libraries: lib-qc (home), lib-cebu');
-    console.log('  books: seed-book-noli (featured), seed-book-elfili (0 copies), seed-book-florante (physical), seed-book-code');
+    console.log('  books: seed-book-noli (featured, gated), seed-book-elfili (0 copies), seed-book-florante (physical), seed-book-code (gated)');
+    console.log('  storage: ebooks/seed-book-noli.pdf, ebooks/seed-book-code.pdf (behind getEbookUrl gate)');
     console.log('  loans: due-soon + overdue · notifications: 2 unread + 1 read · readingProgress: Noli 42/200');
     console.log('  isolation check: docs owned by "seed-user-b" must NOT appear in your dashboard');
 }

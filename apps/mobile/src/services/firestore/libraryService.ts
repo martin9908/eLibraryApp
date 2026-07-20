@@ -17,8 +17,14 @@ import {
     where,
 } from 'firebase/firestore';
 
-import { db } from '@/src/lib/firebase';
+import { httpsCallable } from 'firebase/functions';
+
+import { db, functions } from '@/src/lib/firebase';
 import type { Book, BorrowRecord, DueSoonEntry } from '@/src/types/library';
+
+type GetEbookUrlResult =
+    | { kind: 'signed'; url: string; expiresAt: number }
+    | { kind: 'legacy-drive'; url: string };
 
 const BOOKS_COLLECTION = 'books';
 const BORROW_RECORDS_COLLECTION = 'borrowRecords';
@@ -33,6 +39,7 @@ function mapBook(id: string, raw: Partial<Book>): Book {
         availableCopies: raw.availableCopies ?? 0,
         totalCopies: raw.totalCopies ?? 0,
         ebookUrl: raw.ebookUrl,
+        ebookStoragePath: raw.ebookStoragePath,
         coverImage: raw.coverImage,
         createdAt: raw.createdAt,
     };
@@ -153,6 +160,17 @@ export async function canUserAccessBook(userId: string, bookId: string): Promise
         const data = docSnapshot.data() as Partial<BorrowRecord>;
         return data.bookId === bookId && data.returned === false;
     });
+}
+
+/**
+ * Fetch a fresh, short-lived read URL for a borrowed eBook via the server gate.
+ * The Cloud Function re-verifies the loan and returns a signed URL (or a legacy
+ * Drive URL). Call this on every open — signed URLs expire quickly.
+ */
+export async function getEbookAccessUrl(bookId: string): Promise<string> {
+    const callable = httpsCallable<{ bookId: string }, GetEbookUrlResult>(functions, 'getEbookUrl');
+    const { data } = await callable({ bookId });
+    return data.url;
 }
 
 export async function getAllBooks(filters: {

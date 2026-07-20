@@ -7,7 +7,7 @@ import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 
 import { useAuth } from '@/src/context/AuthContext';
 import { resolveEbookSource } from '@/src/lib/ebookSource';
-import { canUserAccessBook, getBookById } from '@/src/services/firestore/libraryService';
+import { canUserAccessBook, getEbookAccessUrl } from '@/src/services/firestore/libraryService';
 import { saveReadingProgress } from '@/src/services/firestore/readingProgressService';
 import { buildPdfViewerHtml, originOf } from '@/src/screens/reader/pdfViewerHtml';
 import { useBrandColors } from '@/src/theme/brand';
@@ -97,15 +97,10 @@ const ReaderScreen = () => {
                 return;
             }
 
-            const book = await getBookById(route.params.bookId);
-
-            if (!book?.ebookUrl) {
-                setEbookUrl(null);
-                setErrorMessage('No eBook URL was found for this title.');
-                return;
-            }
-
-            setEbookUrl(book.ebookUrl);
+            // Server re-verifies the loan and returns a short-lived signed URL
+            // (or a legacy Drive URL). The permanent public URL is never exposed.
+            const url = await getEbookAccessUrl(route.params.bookId);
+            setEbookUrl(url);
         } catch (openError) {
             const message = openError instanceof Error ? openError.message : 'Unable to open this eBook right now.';
             setErrorMessage(message);

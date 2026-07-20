@@ -5,6 +5,7 @@ import {
     borrowBook,
     getActiveBorrowRecordForBook,
     getBookById,
+    getEbookAccessUrl,
     returnBook,
 } from '@/src/services/libraryService';
 import { saveReadingProgress } from '@/src/services/readingProgressService';
@@ -32,7 +33,8 @@ export default function BookDetailPage() {
     const [loading, setLoading] = useState(true);
     const [actionLoading, setActionLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [readerOpen, setReaderOpen] = useState(false);
+    const [readerUrl, setReaderUrl] = useState<string | null>(null);
+    const [readerLoading, setReaderLoading] = useState(false);
 
     const load = useCallback(async () => {
         setLoading(true);
@@ -61,6 +63,20 @@ export default function BookDetailPage() {
             setError(e instanceof Error ? e.message : 'Borrow failed. Please try again.');
         } finally {
             setActionLoading(false);
+        }
+    };
+
+    const openReader = async () => {
+        if (!book) return;
+        setReaderLoading(true);
+        setError(null);
+        try {
+            // Server re-verifies the loan and returns a short-lived signed URL.
+            setReaderUrl(await getEbookAccessUrl(book.id));
+        } catch {
+            setError('Could not open this eBook. Please try again.');
+        } finally {
+            setReaderLoading(false);
         }
     };
 
@@ -156,9 +172,9 @@ export default function BookDetailPage() {
                     {error && <div className="alert alert-error" style={{ marginTop: 14 }}>⚠️ {error}</div>}
 
                     <div className="detail-actions">
-                        {isBorrowed && book.type === 'ebook' && book.ebookUrl && (
-                            <button className="btn btn-secondary" onClick={() => setReaderOpen(true)}>
-                                📖 Read Online
+                        {isBorrowed && book.type === 'ebook' && (book.ebookStoragePath || book.ebookUrl) && (
+                            <button className="btn btn-secondary" onClick={openReader} disabled={readerLoading}>
+                                {readerLoading ? 'Opening…' : '📖 Read Online'}
                             </button>
                         )}
                         {isBorrowed && (
@@ -197,11 +213,11 @@ export default function BookDetailPage() {
                 </div>
             </div>
 
-            {readerOpen && book.ebookUrl && (
+            {readerUrl && (
                 <PdfReader
-                    url={book.ebookUrl}
+                    url={readerUrl}
                     title={book.title}
-                    onClose={() => setReaderOpen(false)}
+                    onClose={() => setReaderUrl(null)}
                     onProgress={(pageNo, total) => {
                         if (user) void saveReadingProgress(user.uid, book.id, pageNo, total);
                     }}

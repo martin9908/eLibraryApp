@@ -11,7 +11,8 @@ function getExpoHost() {
     const hostUri =
         Constants.expoConfig?.hostUri ??
         Constants.manifest2?.extra?.expoClient?.hostUri ??
-        Constants.manifest?.debuggerHost;
+        // Legacy classic-manifest field, absent from the current typed manifest.
+        (Constants.manifest as { debuggerHost?: string } | null)?.debuggerHost;
 
     if (!hostUri) {
         return 'localhost';

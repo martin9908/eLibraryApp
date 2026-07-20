@@ -1,6 +1,7 @@
 import { FirebaseApp, getApp, getApps, initializeApp } from 'firebase/app';
 import { Auth, getAuth } from 'firebase/auth';
 import { Firestore, getFirestore } from 'firebase/firestore';
+import { Functions, getFunctions } from 'firebase/functions';
 
 type FirebaseConfig = {
     apiKey: string;
@@ -38,3 +39,4 @@ const firebaseApp: FirebaseApp = getApps().length > 0 ? getApp() : initializeApp
 
 export const auth: Auth = getAuth(firebaseApp);
 export const db: Firestore = getFirestore(firebaseApp);
+export const functions: Functions = getFunctions(firebaseApp);

@@ -1,0 +1,17 @@
+rules_version = '2';
+
+// eBook bytes are private. Clients never read Storage directly — the
+// `getEbookUrl` Cloud Function verifies an active loan and hands out a
+// short-lived signed URL. Deny all direct access here so a leaked object
+// path can't be fetched.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /ebooks/{file=**} {
+      allow read, write: if false;
+    }
+    // Everything else stays closed by default too.
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
