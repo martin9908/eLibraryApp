@@ -1,0 +1,65 @@
+# Supabase local config for eLibraryApp (Aklatan+).
+# Migration target from Firebase (see plan: reflective-dragonfly).
+# `project_id` is the local ref used by `supabase start`; the cloud project
+# is linked separately via `supabase link --project-ref <ref>`.
+project_id = "elibrary-app"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+# Set to your deployed web origin in cloud; local default below.
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["http://localhost:3000"]
+jwt_expiry = 3600
+enable_signup = true
+
+[auth.email]
+enable_signup = true
+enable_confirmations = false
+
+[storage]
+enabled = true
+# eBooks live in a private bucket; access only via the getEbookUrl Edge Function.
+file_size_limit = "200MiB"
+
+[edge_runtime]
+enabled = true
+
+# pg_cron drives the daily due-date reminder job (replaces the Firebase scheduler).
+# pg_cron + pg_net are enabled in migration 0003_rpc_triggers.sql (create extension).
+[db.extensions]
+
+# ── Edge Functions ───────────────────────────────────────────────────────────
+# Caller-facing functions verify the user's JWT + role from app_metadata.
+[functions.get-ebook-url]
+verify_jwt = true
+[functions.assign-role]
+verify_jwt = true
+[functions.set-account-status]
+verify_jwt = true
+[functions.update-patron]
+verify_jwt = true
+[functions.delete-book]
+verify_jwt = true
+
+# Internal functions are invoked server-side (pg_cron / DB trigger via pg_net)
+# with the service-role key; they additionally match that key in-code.
+[functions.send-due-reminders]
+verify_jwt = true
+[functions.notify-availability]
+verify_jwt = true

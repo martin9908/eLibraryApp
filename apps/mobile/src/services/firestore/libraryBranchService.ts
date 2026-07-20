@@ -1,45 +1,50 @@
-import { doc, getDoc } from 'firebase/firestore';
-
-import { db } from '@/src/lib/firebase';
+import { supabase } from '@/src/lib/supabase';
+import { rowToLibrary, rowToUserProfile } from '@/src/lib/supabaseMap';
+import type { LibraryRow, UserProfileRow } from '@/src/lib/supabaseMap';
 import type { Library, LibraryHours, UserProfile } from '@/src/types/library';
 
-const LIBRARIES_COLLECTION = 'libraries';
-const USERS_COLLECTION = 'users';
-
-function mapLibrary(id: string, raw: Partial<Library>): Library {
-    return {
-        id,
-        name: raw.name ?? 'Local Library',
-        region: raw.region ?? '',
-        hours: raw.hours,
-        contact: raw.contact,
-    };
-}
+const LIBRARIES_TABLE = 'libraries';
+const USERS_TABLE = 'users';
 
 export async function getLibraryById(libraryId: string): Promise<Library | null> {
-    const snapshot = await getDoc(doc(db, LIBRARIES_COLLECTION, libraryId));
-    if (!snapshot.exists()) return null;
-    return mapLibrary(snapshot.id, snapshot.data() as Partial<Library>);
+    const { data, error } = await supabase
+        .from(LIBRARIES_TABLE)
+        .select('*')
+        .eq('id', libraryId)
+        .maybeSingle();
+    if (error) throw error;
+    if (!data) return null;
+    return rowToLibrary(data as LibraryRow);
 }
 
 /**
- * Reads users/{uid}.homeLibraryId then the corresponding branch document.
+ * Reads users.home_library_id then the corresponding branch row.
  * Returns null when the member has not chosen a home library (the dashboard
  * shows a "choose your library" prompt in that case).
  */
 export async function getHomeLibrary(userId: string): Promise<Library | null> {
-    const userSnapshot = await getDoc(doc(db, USERS_COLLECTION, userId));
-    if (!userSnapshot.exists()) return null;
-    const homeLibraryId = (userSnapshot.data() as UserProfile).homeLibraryId;
+    const { data, error } = await supabase
+        .from(USERS_TABLE)
+        .select('*')
+        .eq('id', userId)
+        .maybeSingle();
+    if (error) throw error;
+    if (!data) return null;
+    const homeLibraryId = rowToUserProfile(data as UserProfileRow).homeLibraryId;
     if (!homeLibraryId) return null;
     return getLibraryById(homeLibraryId);
 }
 
 /** Reads the member's declared member type (for the greeting). */
 export async function getMemberType(userId: string): Promise<UserProfile['memberType']> {
-    const snapshot = await getDoc(doc(db, USERS_COLLECTION, userId));
-    if (!snapshot.exists()) return undefined;
-    return (snapshot.data() as UserProfile).memberType;
+    const { data, error } = await supabase
+        .from(USERS_TABLE)
+        .select('member_type')
+        .eq('id', userId)
+        .maybeSingle();
+    if (error) throw error;
+    if (!data) return undefined;
+    return (data as Pick<UserProfileRow, 'member_type'>).member_type ?? undefined;
 }
 
 /** Parse "HH:mm" into minutes-since-midnight; null when malformed. */

@@ -2,8 +2,7 @@ import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import { Platform } from 'react-native';
 
-import { db } from '@/src/lib/firebase';
-import { doc, serverTimestamp, setDoc, updateDoc } from 'firebase/firestore';
+import { supabase } from '@/src/lib/supabase';
 
 // Configure how notifications appear while the app is in the foreground.
 Notifications.setNotificationHandler({
@@ -52,23 +51,26 @@ export async function registerForPushNotificationsAsync(): Promise<string | null
 }
 
 /**
- * Persist the Expo push token to Firestore so Cloud Functions can use it.
- * Upserts `users/{userId}` with the token and updatedAt timestamp.
+ * Persist the Expo push token to Supabase so server-side jobs can use it.
+ * Updates the `users` profile row (created at sign-up) with the token and a
+ * fresh updated_at timestamp.
  */
 export async function savePushToken(userId: string, token: string): Promise<void> {
-    const userRef = doc(db, 'users', userId);
-    await setDoc(
-        userRef,
-        { expoPushToken: token, updatedAt: serverTimestamp() },
-        { merge: true },
-    );
+    const { error } = await supabase
+        .from('users')
+        .update({ expo_push_token: token, updated_at: new Date().toISOString() })
+        .eq('id', userId);
+    if (error) throw error;
 }
 
 /**
- * Clear the push token from Firestore on sign-out so the user stops receiving
- * notifications for this device session.
+ * Clear the push token on sign-out so the user stops receiving notifications
+ * for this device session.
  */
 export async function clearPushToken(userId: string): Promise<void> {
-    const userRef = doc(db, 'users', userId);
-    await updateDoc(userRef, { expoPushToken: null, updatedAt: serverTimestamp() });
+    const { error } = await supabase
+        .from('users')
+        .update({ expo_push_token: null, updated_at: new Date().toISOString() })
+        .eq('id', userId);
+    if (error) throw error;
 }

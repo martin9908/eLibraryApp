@@ -1,4 +1,17 @@
-import type { Timestamp } from 'firebase/firestore';
+/**
+ * Structural stand-in for the Firebase `Timestamp` (Firebase -> Supabase migration).
+ * Supabase returns timestamptz as ISO strings; `toTimestamp` (see
+ * `@/src/lib/supabaseMap`) wraps them in this shape so existing consumers that
+ * read `.seconds` / call `.toDate()` keep working without change.
+ */
+export interface FirestoreTimestamp {
+    seconds: number;
+    nanoseconds: number;
+    toDate(): Date;
+}
+
+/** @deprecated Alias kept for source-compatibility with pre-migration code. */
+export type Timestamp = FirestoreTimestamp;
 
 export type BookType = 'ebook' | 'physical';
 

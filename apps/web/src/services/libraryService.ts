@@ -1,145 +1,103 @@
-import {
-    collection,
-    doc,
-    documentId,
-    getDoc,
-    getDocs,
-    increment,
-    limit,
-    query,
-    runTransaction,
-    serverTimestamp,
-    Timestamp,
-    updateDoc,
-    where,
-} from 'firebase/firestore';
-
-import { httpsCallable } from 'firebase/functions';
-
-import { db, functions } from '@/src/lib/firebase';
+import { supabase } from '@/src/lib/supabase';
+import { rowToBook, rowToBorrowRecord } from '@/src/lib/supabaseMap';
+import type { BookRow, BorrowRecordRow } from '@/src/lib/supabaseMap';
 import type { Book, BookType, BorrowRecord, DueSoonEntry } from '@elibrary/types';
-
-type GetEbookUrlResult =
-    | { kind: 'signed'; url: string; expiresAt: number }
-    | { kind: 'legacy-drive'; url: string };
 
 /**
  * Fetch a fresh, short-lived read URL for a borrowed eBook via the server gate.
- * The Cloud Function re-verifies the loan and returns a signed URL (or a legacy
+ * The Edge Function re-verifies the loan and returns a signed URL (or a legacy
  * Drive URL). Call this on every open — signed URLs expire quickly.
+ *
+ * Edge Function contract: `get-ebook-url` accepts `{ bookId }` and returns a
+ * body of `{ kind: 'signed'; url; expiresAt } | { kind: 'legacy-drive'; url }`.
  */
 export async function getEbookAccessUrl(bookId: string): Promise<string> {
-    const callable = httpsCallable<{ bookId: string }, GetEbookUrlResult>(functions, 'getEbookUrl');
-    const { data } = await callable({ bookId });
+    const { data, error } = await supabase.functions.invoke<{ url: string }>('get-ebook-url', {
+        body: { bookId },
+    });
+    if (error) throw error;
+    if (!data?.url) throw new Error('No eBook URL returned.');
     return data.url;
 }
 
 const BOOKS = 'books';
-const RECORDS = 'borrowRecords';
-
-function mapBook(id: string, raw: Partial<Book>): Book {
-    return {
-        id,
-        title: raw.title ?? 'Untitled',
-        author: raw.author ?? 'Unknown author',
-        type: raw.type ?? 'ebook',
-        category: raw.category ?? 'General',
-        availableCopies: raw.availableCopies ?? 0,
-        totalCopies: raw.totalCopies ?? 0,
-        ebookUrl: raw.ebookUrl,
-        ebookStoragePath: raw.ebookStoragePath,
-        coverImage: raw.coverImage,
-    };
-}
-
-function mapRecord(id: string, raw: Record<string, unknown>): BorrowRecord {
-    return {
-        id,
-        userId: (raw.userId as string) ?? '',
-        bookId: (raw.bookId as string) ?? '',
-        type: (raw.type as BookType) ?? 'ebook',
-        borrowedAt: raw.borrowedAt as BorrowRecord['borrowedAt'],
-        dueDate: raw.dueDate as BorrowRecord['dueDate'],
-        returnedAt: raw.returnedAt as BorrowRecord['returnedAt'],
-        returned: Boolean(raw.returned),
-    };
-}
+const RECORDS = 'borrow_records';
 
 export async function getAllBooks(filters: { type?: BookType; category?: string } = {}): Promise<Book[]> {
-    const ref = collection(db, BOOKS);
-    const constraints = [];
-    if (filters.type) constraints.push(where('type', '==', filters.type));
-    if (filters.category) constraints.push(where('category', '==', filters.category));
-    const snap = await getDocs(constraints.length ? query(ref, ...constraints) : query(ref));
-    return snap.docs.map((d) => mapBook(d.id, d.data() as Partial<Book>));
+    let q = supabase.from(BOOKS).select('*');
+    if (filters.type) q = q.eq('type', filters.type);
+    if (filters.category) q = q.eq('category', filters.category);
+    const { data, error } = await q;
+    if (error) throw error;
+    return (data as BookRow[]).map(rowToBook);
 }
 
 export async function getBookById(bookId: string): Promise<Book | null> {
-    const snap = await getDoc(doc(db, BOOKS, bookId));
-    if (!snap.exists()) return null;
-    return mapBook(snap.id, snap.data() as Partial<Book>);
+    const { data, error } = await supabase.from(BOOKS).select('*').eq('id', bookId).maybeSingle();
+    if (error) throw error;
+    if (!data) return null;
+    return rowToBook(data as BookRow);
 }
 
 export async function getBooksByIds(ids: string[]): Promise<Map<string, Book>> {
     if (ids.length === 0) return new Map();
-    const chunks: string[][] = [];
-    for (let i = 0; i < ids.length; i += 30) chunks.push(ids.slice(i, i + 30));
-    const snapshots = await Promise.all(
-        chunks.map((chunk) => getDocs(query(collection(db, BOOKS), where(documentId(), 'in', chunk)))),
-    );
+    const { data, error } = await supabase.from(BOOKS).select('*').in('id', ids);
+    if (error) throw error;
     const map = new Map<string, Book>();
-    for (const snap of snapshots) {
-        for (const d of snap.docs) map.set(d.id, mapBook(d.id, d.data() as Partial<Book>));
+    for (const row of data as BookRow[]) {
+        const book = rowToBook(row);
+        map.set(book.id, book);
     }
     return map;
 }
 
 export async function getAllBorrowRecords(userId: string): Promise<BorrowRecord[]> {
-    const q = query(collection(db, RECORDS), where('userId', '==', userId));
-    const snap = await getDocs(q);
-    const records = snap.docs.map((d) => mapRecord(d.id, d.data() as Record<string, unknown>));
-    return records.sort((a, b) => ((b.borrowedAt?.seconds ?? 0) - (a.borrowedAt?.seconds ?? 0)));
+    const { data, error } = await supabase.from(RECORDS).select('*').eq('user_id', userId);
+    if (error) throw error;
+    const records = (data as BorrowRecordRow[]).map(rowToBorrowRecord);
+    return records.sort((a, b) => (b.borrowedAt?.seconds ?? 0) - (a.borrowedAt?.seconds ?? 0));
 }
 
 export async function getActiveBorrowRecordForBook(
     userId: string,
     bookId: string,
 ): Promise<BorrowRecord | null> {
-    const q = query(
-        collection(db, RECORDS),
-        where('userId', '==', userId),
-        where('bookId', '==', bookId),
-        limit(10),
-    );
-    const snap = await getDocs(q);
-    const active = snap.docs.find((d) => !(d.data() as { returned?: boolean }).returned);
+    const { data, error } = await supabase
+        .from(RECORDS)
+        .select('*')
+        .eq('user_id', userId)
+        .eq('book_id', bookId)
+        .limit(10);
+    if (error) throw error;
+    const active = (data as BorrowRecordRow[]).find((r) => !r.returned);
     if (!active) return null;
-    return mapRecord(active.id, active.data() as Record<string, unknown>);
+    return rowToBorrowRecord(active);
 }
 
+/**
+ * Borrow a title. Copy-count decrement + loan creation are atomic on the
+ * server: `borrow_book(p_book_id, p_type, p_due_date)` verifies availability,
+ * decrements `available_copies`, and inserts the `borrow_records` row for the
+ * calling user (user id derived from the JWT server-side). Throws when the
+ * title is unavailable.
+ */
 export async function borrowBook(userId: string, book: Book): Promise<void> {
-    const bookRef = doc(db, BOOKS, book.id);
-    await runTransaction(db, async (tx) => {
-        const snap = await tx.get(bookRef);
-        if (!snap.exists()) throw new Error('Book does not exist.');
-        const available = (snap.data().availableCopies as number) ?? 0;
-        if (available <= 0) throw new Error('This title is currently not available.');
-        tx.update(bookRef, { availableCopies: increment(-1) });
+    const dueDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    const { error } = await supabase.rpc('borrow_book', {
+        p_book_id: book.id,
+        p_type: book.type,
+        p_due_date: dueDate,
     });
-    const { addDoc } = await import('firebase/firestore');
-    await addDoc(collection(db, RECORDS), {
-        userId,
-        bookId: book.id,
-        type: book.type,
-        borrowedAt: serverTimestamp(),
-        dueDate: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
-        returned: false,
-    });
+    if (error) throw error;
 }
 
+/**
+ * Return a loan. Marks the record returned and increments the book's
+ * `available_copies` atomically on the server via `return_book(p_record_id)`.
+ */
 export async function returnBook(recordId: string, bookId: string): Promise<void> {
-    await updateDoc(doc(db, RECORDS, recordId), { returned: true, returnedAt: serverTimestamp() });
-    await updateDoc(doc(db, BOOKS, bookId), { availableCopies: increment(1) });
+    const { error } = await supabase.rpc('return_book', { p_record_id: recordId });
+    if (error) throw error;
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -150,17 +108,20 @@ const DAY_MS = 24 * 60 * 60 * 1000;
  * rollout. Never throws on empty — returns [].
  */
 export async function getFeaturedBooks(max = 4): Promise<Book[]> {
-    const ref = collection(db, BOOKS);
     try {
-        const snap = await getDocs(
-            query(ref, where('type', '==', 'ebook'), where('featured', '==', true), limit(max)),
-        );
-        if (!snap.empty) return snap.docs.map((d) => mapBook(d.id, d.data() as Partial<Book>));
+        const { data, error } = await supabase
+            .from(BOOKS)
+            .select('*')
+            .eq('type', 'ebook')
+            .eq('featured', true)
+            .limit(max);
+        if (!error && data && data.length > 0) return (data as BookRow[]).map(rowToBook);
     } catch {
-        // Missing composite index or no matches — fall through to the fallback.
+        // Query issue or no matches — fall through to the fallback.
     }
-    const fallback = await getDocs(query(ref, where('type', '==', 'ebook'), limit(max)));
-    return fallback.docs.map((d) => mapBook(d.id, d.data() as Partial<Book>));
+    const { data, error } = await supabase.from(BOOKS).select('*').eq('type', 'ebook').limit(max);
+    if (error) throw error;
+    return (data as BookRow[]).map(rowToBook);
 }
 
 function dueSoonLabel(daysLeft: number): { urgency: 'overdue' | 'dueSoon'; label: string } {

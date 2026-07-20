@@ -1,23 +1,16 @@
-import {
-    collection,
-    doc,
-    getDocs,
-    limit,
-    orderBy,
-    query,
-    serverTimestamp,
-    setDoc,
-    where,
-} from 'firebase/firestore';
-
-import { db } from '@/src/lib/firebase';
+import { supabase } from '@/src/lib/supabase';
+import { rowToReadingProgress } from '@/src/lib/supabaseMap';
+import type { ReadingProgressRow } from '@/src/lib/supabaseMap';
 import { getBooksByIds } from '@/src/services/libraryService';
-import type { ReadingProgress, ReadingProgressEntry } from '@elibrary/types';
+import type { ReadingProgressEntry } from '@elibrary/types';
+
+const READING_PROGRESS = 'reading_progress';
 
 /**
- * Persist a member's reading position (owner-only per security rules). Keyed by
- * `${userId}_${bookId}` so re-reads update in place. Called by the reader as the
- * page changes — this is what makes Continue Reading reflect reality.
+ * Persist a member's reading position (owner-only per RLS). Keyed by
+ * `${userId}_${bookId}` so re-reads update in place (upsert on the
+ * (user_id, book_id) unique constraint). Called by the reader as the page
+ * changes — this is what makes Continue Reading reflect reality.
  */
 export async function saveReadingProgress(
     userId: string,
@@ -26,24 +19,18 @@ export async function saveReadingProgress(
     totalPages: number,
 ): Promise<void> {
     if (!userId || !bookId || totalPages <= 0) return;
-    await setDoc(
-        doc(db, 'readingProgress', `${userId}_${bookId}`),
-        { userId, bookId, currentPage, totalPages, updatedAt: serverTimestamp() },
-        { merge: true },
+    const { error } = await supabase.from(READING_PROGRESS).upsert(
+        {
+            id: `${userId}_${bookId}`,
+            user_id: userId,
+            book_id: bookId,
+            current_page: currentPage,
+            total_pages: totalPages,
+            updated_at: new Date().toISOString(),
+        },
+        { onConflict: 'user_id,book_id' },
     );
-}
-
-const READING_PROGRESS = 'readingProgress';
-
-function mapProgress(id: string, raw: Record<string, unknown>): ReadingProgress {
-    return {
-        id,
-        userId: (raw.userId as string) ?? '',
-        bookId: (raw.bookId as string) ?? '',
-        currentPage: (raw.currentPage as number) ?? 1,
-        totalPages: (raw.totalPages as number) ?? 0,
-        updatedAt: raw.updatedAt as ReadingProgress['updatedAt'],
-    };
+    if (error) throw error;
 }
 
 /**
@@ -52,14 +39,14 @@ function mapProgress(id: string, raw: Record<string, unknown>): ReadingProgress 
  * panel never renders a broken item. Scoped to the passed userId (FR-020).
  */
 export async function getContinueReading(userId: string, max = 4): Promise<ReadingProgressEntry[]> {
-    const q = query(
-        collection(db, READING_PROGRESS),
-        where('userId', '==', userId),
-        orderBy('updatedAt', 'desc'),
-        limit(max),
-    );
-    const snap = await getDocs(q);
-    const progresses = snap.docs.map((d) => mapProgress(d.id, d.data() as Record<string, unknown>));
+    const { data, error } = await supabase
+        .from(READING_PROGRESS)
+        .select('*')
+        .eq('user_id', userId)
+        .order('updated_at', { ascending: false })
+        .limit(max);
+    if (error) throw error;
+    const progresses = (data as ReadingProgressRow[]).map(rowToReadingProgress);
     if (progresses.length === 0) return [];
 
     const bookMap = await getBooksByIds(Array.from(new Set(progresses.map((p) => p.bookId))));

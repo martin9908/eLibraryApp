@@ -1,0 +1,18 @@
+{
+  "name": "koha-export",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Export Aklatan+ (Supabase) catalog and patrons into Koha-importable formats.",
+  "scripts": {
+    "export:patrons": "tsx src/exportPatrons.ts",
+    "export:materials": "tsx src/exportMaterials.ts"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.0",
+    "typescript": "^5.5.0"
+  }
+}

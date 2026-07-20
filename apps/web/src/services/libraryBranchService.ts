@@ -1,36 +1,32 @@
-import { doc, getDoc } from 'firebase/firestore';
-
-import { db } from '@/src/lib/firebase';
-import type { Library, LibraryHours, UserProfile } from '@elibrary/types';
+import { supabase } from '@/src/lib/supabase';
+import { rowToLibrary, rowToUserProfile } from '@/src/lib/supabaseMap';
+import type { LibraryRow, UserRow } from '@/src/lib/supabaseMap';
+import type { Library, LibraryHours } from '@elibrary/types';
 
 const LIBRARIES = 'libraries';
 const USERS = 'users';
 
-function mapLibrary(id: string, raw: Partial<Library>): Library {
-    return {
-        id,
-        name: raw.name ?? 'Local Library',
-        region: raw.region ?? '',
-        hours: raw.hours,
-        contact: raw.contact,
-    };
-}
-
 export async function getLibraryById(libraryId: string): Promise<Library | null> {
-    const snap = await getDoc(doc(db, LIBRARIES, libraryId));
-    if (!snap.exists()) return null;
-    return mapLibrary(snap.id, snap.data() as Partial<Library>);
+    const { data, error } = await supabase
+        .from(LIBRARIES)
+        .select('*')
+        .eq('id', libraryId)
+        .maybeSingle();
+    if (error) throw error;
+    if (!data) return null;
+    return rowToLibrary(data as LibraryRow);
 }
 
 /**
  * Reads the member's users/{uid}.homeLibraryId then the corresponding branch
- * document. Returns null when the member has not chosen a home library (the
+ * row. Returns null when the member has not chosen a home library (the
  * dashboard shows a "choose your library" prompt in that case).
  */
 export async function getHomeLibrary(userId: string): Promise<Library | null> {
-    const userSnap = await getDoc(doc(db, USERS, userId));
-    if (!userSnap.exists()) return null;
-    const homeLibraryId = (userSnap.data() as UserProfile).homeLibraryId;
+    const { data, error } = await supabase.from(USERS).select('*').eq('id', userId).maybeSingle();
+    if (error) throw error;
+    if (!data) return null;
+    const homeLibraryId = rowToUserProfile(data as UserRow).homeLibraryId;
     if (!homeLibraryId) return null;
     return getLibraryById(homeLibraryId);
 }

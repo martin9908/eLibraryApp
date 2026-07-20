@@ -1,0 +1,7 @@
+node_modules/
+# Sensitive: password-reset links + any credentials. Never commit.
+recovery-links.json
+*.json
+!package.json
+!tsconfig.json
+binangonan-elibrary-app-firebase-adminsdk-fbsvc-b7e1e3137a.json

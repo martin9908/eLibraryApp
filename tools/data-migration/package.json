@@ -1,0 +1,16 @@
+{
+  "name": "@elibrary/data-migration",
+  "private": true,
+  "type": "module",
+  "description": "One-shot Firestore -> Supabase Postgres data migration (Step 8).",
+  "scripts": {
+    "migrate": "tsx src/migrate.ts",
+    "migrate:dry": "tsx src/migrate.ts --dry-run"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "firebase-admin": "^13.10.0",
+    "tsx": "^4.19.0",
+    "typescript": "~5.9.2"
+  }
+}
