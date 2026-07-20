@@ -14,8 +14,25 @@ import {
     where,
 } from 'firebase/firestore';
 
-import { db } from '@/src/lib/firebase';
+import { httpsCallable } from 'firebase/functions';
+
+import { db, functions } from '@/src/lib/firebase';
 import type { Book, BookType, BorrowRecord, DueSoonEntry } from '@elibrary/types';
+
+type GetEbookUrlResult =
+    | { kind: 'signed'; url: string; expiresAt: number }
+    | { kind: 'legacy-drive'; url: string };
+
+/**
+ * Fetch a fresh, short-lived read URL for a borrowed eBook via the server gate.
+ * The Cloud Function re-verifies the loan and returns a signed URL (or a legacy
+ * Drive URL). Call this on every open — signed URLs expire quickly.
+ */
+export async function getEbookAccessUrl(bookId: string): Promise<string> {
+    const callable = httpsCallable<{ bookId: string }, GetEbookUrlResult>(functions, 'getEbookUrl');
+    const { data } = await callable({ bookId });
+    return data.url;
+}
 
 const BOOKS = 'books';
 const RECORDS = 'borrowRecords';
@@ -30,6 +47,7 @@ function mapBook(id: string, raw: Partial<Book>): Book {
         availableCopies: raw.availableCopies ?? 0,
         totalCopies: raw.totalCopies ?? 0,
         ebookUrl: raw.ebookUrl,
+        ebookStoragePath: raw.ebookStoragePath,
         coverImage: raw.coverImage,
     };
 }

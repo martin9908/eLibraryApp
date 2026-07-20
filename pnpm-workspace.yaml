@@ -6,6 +6,12 @@ allowBuilds:
   '@firebase/util': true
   # pdfjs-dist's optional native canvas — never built; aliased to a stub for the browser.
   canvas: false
+  dtrace-provider: set this to true or false
   protobufjs: true
   sharp: true
   unrs-resolver: true
+minimumReleaseAgeExclude:
+  - '@expo/eas-build-job@21.0.2'
+  - '@expo/eas-json@21.0.2'
+  - '@expo/steps@21.0.2'
+  - eas-cli@21.0.2

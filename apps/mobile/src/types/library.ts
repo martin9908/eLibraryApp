@@ -10,7 +10,10 @@ export type Book = {
     category: string;
     availableCopies: number;
     totalCopies: number;
+    /** Legacy: public/Drive URL. Kept only for un-migrated titles. */
     ebookUrl?: string;
+    /** Storage object path (e.g. `ebooks/{bookId}.pdf`) for gated titles. */
+    ebookStoragePath?: string;
     coverImage?: string;
     createdAt?: Timestamp;
     /** Curated flag — eligible for the Featured panel when true and type === 'ebook'. */

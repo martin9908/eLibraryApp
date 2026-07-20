@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Aklatan+",
-    "slug": "eLibraryApp",
+    "slug": "elibrary-app",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -52,6 +52,18 @@
     ],
     "experiments": {
       "reactCompiler": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "64d990f5-1567-4b87-a24b-16ca89307953"
+      }
+    },
+    "owner": "rhype_ph",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/64d990f5-1567-4b87-a24b-16ca89307953"
     }
   }
 }

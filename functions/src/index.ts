@@ -14,6 +14,11 @@ export { deleteBook } from './rbac/deleteBook';          // librarian/admin: sco
 export { setAccountStatus } from './rbac/setAccountStatus'; // suspend/reactivate; scoped for librarians (US2)
 export { updatePatron } from './rbac/updatePatron';      // scoped patron-profile edits (US2)
 
+// ─── Secure eBook access ─────────────────────────────────────────────────────
+// Server-side loan gate: issues short-lived signed URLs to borrowed eBook bytes
+// instead of exposing permanent bearer URLs.
+export { getEbookUrl } from './ebooks/getEbookUrl';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
